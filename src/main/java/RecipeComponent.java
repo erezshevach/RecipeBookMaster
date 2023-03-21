@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 public class RecipeComponent {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue//(strategy = GenerationType.IDENTITY)
     private long id;
     //@ManyToOne
     //private Ingredient ingredient;
@@ -16,7 +16,8 @@ public class RecipeComponent {
     private Uom uom;
     private int processSeq;
     @ManyToOne
-    private Recipe recipe;
+    @JoinColumn(name = "recipe_id")
+    private Recipe ofRecipe;
 
     // ---------- constructors ----------
     public RecipeComponent() {
@@ -28,10 +29,18 @@ public class RecipeComponent {
         this.quantity = quantity;
         this.uom = uom;
         this.processSeq = processSeq;
-        this.recipe = recipe;
+        this.ofRecipe = recipe;
     }
 
     // ---------- getters/setters ----------
+    public long getId() {
+        return id;
+    }
+
+    private void setId(long id) {
+        this.id = id;
+    }
+
     public String getIngredient() {
         return ingredient;
     }
@@ -72,12 +81,12 @@ public class RecipeComponent {
         this.processSeq = processSeq;
     }
 
-    public Recipe getRecipe() {
-        return recipe;
+    public Recipe getOfRecipe() {
+        return ofRecipe;
     }
 
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
+    public void setOfRecipe(Recipe recipe) {
+        this.ofRecipe = recipe;
     }
 
     public String toString() {

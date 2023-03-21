@@ -1,6 +1,4 @@
 import jakarta.persistence.*;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +9,12 @@ import util.DbOperations;
 public class Recipe {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue//(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
     private List<RecipeProcess> processes = new ArrayList<>();
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
     private List<RecipeComponent> components = new ArrayList<>();
     //@ManyToMany
     //private List<RecipeTag> tags;
@@ -28,9 +26,9 @@ public class Recipe {
     private boolean vegan = false;
 
     // ---------- constructors ----------
-    private Recipe() {}
+    public Recipe() {}
 
-    private Recipe(String name) {
+    public Recipe(String name) {
         this.name = name;
     }
 
@@ -74,44 +72,36 @@ public class Recipe {
 
     }
 
-    public static boolean addRecipe(Recipe recipe, Session session) {
+    public static boolean addRecipe(Recipe recipe, EntityManager pContext) {
         boolean success = false;
-        if (isRecipeNameExists(recipe.getName(), session)) {
+        if (isRecipeNameExists(recipe.getName(), pContext)) {
             System.out.println("recipe " + recipe.getName() + " already exsists");
         } else {
-            DbOperations.insertObject(recipe, session);
+            DbOperations.insertObject(recipe, pContext);
             success = true;
         }
         return success;
     }
 
-    public static Boolean isRecipeNameExists(String name, Session session) throws IllegalArgumentException {
-        Transaction tx = session.beginTransaction();
-        boolean result = session.createQuery("select name from Recipe where name = :n", String.class).setParameter("n", name).uniqueResult() != null;
-        tx.commit();
-        return result;
+    public static Boolean isRecipeNameExists(String name, EntityManager pContext) throws IllegalArgumentException {
+        return !pContext.createQuery("select name from Recipe where name = :n", String.class).setParameter("n", name).getResultList().isEmpty();
     }
 
-    public static List<String> getRecipeNamesListByPartialName(String name, Session session) throws IllegalArgumentException {
+    public static List<String> getRecipeNamesListByPartialName(String name, EntityManager pContext) throws IllegalArgumentException {
         String validNames = "%"+name+"%";
-        Transaction tx = session.beginTransaction();
-        List<String> names = session.createQuery("select name from Recipe where name like :n", String.class).setParameter("n", validNames).list();
-        tx.commit();
-        return names;
+        return pContext.createQuery("select name from Recipe where name like :n", String.class).setParameter("n", validNames).getResultList();
     }
 
-    public static Recipe getRecipeByName(String name, Session session) throws IllegalArgumentException {
-        Transaction tx = session.beginTransaction();
-        Recipe recipe = session.createQuery("from Recipe where name = :n", Recipe.class).setParameter("n", name).uniqueResult();
-        tx.commit();
-        return recipe;
-    }
+//    public static Recipe getRecipeByName(String name, EntityManager pContext) throws IllegalArgumentException {
+//        pContext.createQuery("from Recipe where name = :n", Recipe.class).setParameter("n", name).uniqueResult();
+//        return recipe;
+//    }
 
-    public static void getRecipesListByAttribute() {}
+    //public static void getRecipeNamesListByAttribute() {}
 
-    public static void getRecipesListByIngredient() {}
+    //public static void getRecipeNamesListByIngredient() {}
 
-    public static void filterRecipesListByAttribute() {}
+    //public static void filterRecipesListByAttribute() {}
 
     //    public void calculateContainsDairy(Predicate<Ingredient> getter) {
 //        boolean res = false;

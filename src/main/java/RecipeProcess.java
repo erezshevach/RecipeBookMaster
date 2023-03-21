@@ -5,12 +5,13 @@ import jakarta.persistence.*;
 public class RecipeProcess {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue//(strategy = GenerationType.IDENTITY)
     private long id;
     private int sequence;
     private String description;
     @ManyToOne
-    private Recipe recipe;
+    @JoinColumn(name = "recipe_id")
+    private Recipe ofRecipe;
 
     // ---------- constructors ----------
     public RecipeProcess() {
@@ -19,10 +20,18 @@ public class RecipeProcess {
     public RecipeProcess(int sequence, String description, Recipe recipe) {
         this.sequence = sequence;
         this.description = description;
-        this.recipe = recipe;
+        this.ofRecipe = recipe;
     }
 
     // ---------- getters/setters ----------
+    public long getId() {
+        return id;
+    }
+
+    private void setId(long id) {
+        this.id = id;
+    }
+
     public int getSequence() {
         return sequence;
     }
@@ -39,12 +48,12 @@ public class RecipeProcess {
         this.description = description;
     }
 
-    public Recipe getRecipe() {
-        return recipe;
+    public Recipe getOfRecipe() {
+        return ofRecipe;
     }
 
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
+    public void setOfRecipe(Recipe recipe) {
+        this.ofRecipe = recipe;
     }
 
     public String toString() {
