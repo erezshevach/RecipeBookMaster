@@ -1,4 +1,5 @@
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class RecipeComponent {
@@ -14,22 +15,34 @@ public class RecipeComponent {
     private String state;
     private double quantity;
     private Uom uom;
-    private int processSeq;
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe ofRecipe;
+    @ManyToOne
+    @JoinColumn(name = "recipeprocess_id")
+    private RecipeProcess ofProcess;
 
     // ---------- constructors ----------
     public RecipeComponent() {
     }
 
-    public RecipeComponent(String ingredient, String state, double quantity, Uom uom, int processSeq, Recipe recipe) {
+    public RecipeComponent(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, @NotNull Recipe recipe, @NotNull RecipeProcess process) {
         this.ingredient = ingredient;
         this.state = state;
         this.quantity = quantity;
         this.uom = uom;
-        this.processSeq = processSeq;
         this.ofRecipe = recipe;
+        this.ofProcess = process;
+    }
+
+    // ---------- methods ----------
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append(quantity).append(" ").append(uom).append(" ").append(ingredient);
+        if (state != null) {
+            s.append(" ").append(state);
+        }
+        return s.toString();
     }
 
     // ---------- getters/setters ----------
@@ -73,14 +86,6 @@ public class RecipeComponent {
         this.uom = uom;
     }
 
-    public int getProcessSeq() {
-        return processSeq;
-    }
-
-    public void setProcessSeq(int processSeq) {
-        this.processSeq = processSeq;
-    }
-
     public Recipe getOfRecipe() {
         return ofRecipe;
     }
@@ -89,7 +94,11 @@ public class RecipeComponent {
         this.ofRecipe = recipe;
     }
 
-    public String toString() {
-        return quantity + " " + uom + " " + ingredient + " " + state + "(" + processSeq + ")";
+    public RecipeProcess getOfProcess() {
+        return ofProcess;
+    }
+
+    public void setOfProcess(RecipeProcess ofProcess) {
+        this.ofProcess = ofProcess;
     }
 }

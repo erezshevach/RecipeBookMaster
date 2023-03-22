@@ -1,6 +1,7 @@
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import util.DbOperations;
@@ -14,8 +15,7 @@ public class Recipe {
     private String name;
     @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
     private List<RecipeProcess> processes = new ArrayList<>();
-    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
-    private List<RecipeComponent> components = new ArrayList<>();
+
     //@ManyToMany
     //private List<RecipeTag> tags;
     private Integer kCalPer100g = 0;
@@ -32,24 +32,9 @@ public class Recipe {
         this.name = name;
     }
 
-    public static Recipe createRecipe(String name, List<String> input_processes, String[] ingredients, String[] states, double[] qtys, Uom[] uoms, int[] seqs) {
-        Recipe recipe = new Recipe(name);
-
-        List<RecipeProcess> processes = new ArrayList<>();
-        int seq = 0;
-        for (String s : input_processes){
-            processes.add(new RecipeProcess(++seq, s, recipe));
-        }
-        recipe.setProcesses(processes);
-
-        List<RecipeComponent> components = new ArrayList<>();
-        for (int i = 0; i<ingredients.length; i++) {
-            if (seqs[i] > processes.size()) {
-                //alert
-            }
-            components.add(new RecipeComponent(ingredients[i], states[i], qtys[i], uoms[i], seqs[i], recipe));
-        }
-        recipe.setComponents(components);
+    public static Recipe createRecipe(String name, String[] input_processes, String[] ingredients, String[] states, double[] qtys, Uom[] uoms, int[] seqs) {
+        Recipe recipe = new Recipe(name)
+                .updateProcessesAndComponents(input_processes, ingredients, states, qtys, uoms, seqs);
 
         return recipe;
     }
@@ -60,13 +45,11 @@ public class Recipe {
         StringBuilder s = new StringBuilder()
                 .append(id)
                 .append(" ")
-                .append(name)
-                .append(":\n");
-        for (RecipeComponent c : components) {
-            s.append(c.toString()).append("\n");
-        }
+                .append(name);
         for (RecipeProcess p : processes) {
-            s.append(p.toString()).append("\n");
+            if (p != null) {
+                s.append("\n").append(p.toString());
+            }
         }
         return s.toString();
 
@@ -92,10 +75,36 @@ public class Recipe {
         return pContext.createQuery("select name from Recipe where name like :n", String.class).setParameter("n", validNames).getResultList();
     }
 
-//    public static Recipe getRecipeByName(String name, EntityManager pContext) throws IllegalArgumentException {
-//        pContext.createQuery("from Recipe where name = :n", Recipe.class).setParameter("n", name).uniqueResult();
-//        return recipe;
-//    }
+    /**
+     * returns the first recipe with the matching name, or null, if none such recipe exists.
+     */
+    public static Recipe getRecipeByName(String name, EntityManager pContext) throws IllegalArgumentException {
+        Recipe recipe = null;
+        List<Recipe> results = pContext.createQuery("from Recipe where name = :n", Recipe.class).setParameter("n", name).getResultList();
+        if (!results.isEmpty()) { recipe = results.get(0); }
+        return recipe;
+    }
+
+    private Recipe updateProcessesAndComponents(String[] input_processes, String[] ingredients, String[] states, double[] qtys, Uom[] uoms, int[] seqs) {
+        RecipeProcess[] processes = new RecipeProcess[input_processes.length];
+        for (int i = 0; i < input_processes.length; i++){
+            String description = input_processes[i] != null ? input_processes[i] : "";
+            processes[i] = new RecipeProcess(i + 1, description , this);
+        }
+
+        for (int i = 0; i < ingredients.length; i++){
+            if (seqs[i] > processes.length) {
+                //alert
+            }
+            RecipeProcess relatedProcess = processes[seqs[i] - 1];
+            RecipeComponent component = new RecipeComponent(ingredients[i], states[i], qtys[i], uoms[i], this, relatedProcess);
+            List<RecipeComponent> components = relatedProcess.getComponents();
+            components.add(component);
+            relatedProcess.setComponents(components);
+        }
+        this.processes = Arrays.asList(processes);
+        return this;
+    }
 
     //public static void getRecipeNamesListByAttribute() {}
 
@@ -137,14 +146,6 @@ public class Recipe {
 
     public void setProcesses(List<RecipeProcess> processes) {
         this.processes = processes;
-    }
-
-    public List<RecipeComponent> getComponents() {
-        return components;
-    }
-
-    public void setComponents(List<RecipeComponent> components) {
-        this.components = components;
     }
 
     public Integer getkCalPer100g() {
