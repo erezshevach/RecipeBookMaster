@@ -1,8 +1,11 @@
+package com.erezshevach.recipebookmaster.io.entity;
+
+import com.erezshevach.recipebookmaster.Uom;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
-@Entity
-public class RecipeComponent {
+@Entity(name = "recipe_components")
+public class RecipeComponentEntity {
 
     @Id
     @GeneratedValue//(strategy = GenerationType.IDENTITY)
@@ -17,21 +20,21 @@ public class RecipeComponent {
     private Uom uom;
     @ManyToOne
     @JoinColumn(name = "recipe_id")
-    private Recipe ofRecipe;
+    private RecipeEntity ofRecipe;
     @ManyToOne
     @JoinColumn(name = "recipeprocess_id")
-    private RecipeProcess ofProcess;
+    private RecipeProcessEntity ofProcess;
 
     // ---------- constructors ----------
-    public RecipeComponent() {
+    protected RecipeComponentEntity() {
     }
 
-    public RecipeComponent(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, @NotNull Recipe recipe, @NotNull RecipeProcess process) {
+    public RecipeComponentEntity(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, @NotNull RecipeEntity recipeEntity, @NotNull RecipeProcessEntity process) {
         this.ingredient = ingredient;
         this.state = state;
         this.quantity = quantity;
         this.uom = uom;
-        this.ofRecipe = recipe;
+        this.ofRecipe = recipeEntity;
         this.ofProcess = process;
     }
 
@@ -86,19 +89,19 @@ public class RecipeComponent {
         this.uom = uom;
     }
 
-    public Recipe getOfRecipe() {
+    public RecipeEntity getOfRecipe() {
         return ofRecipe;
     }
 
-    public void setOfRecipe(Recipe recipe) {
-        this.ofRecipe = recipe;
+    public void setOfRecipe(RecipeEntity recipeEntity) {
+        this.ofRecipe = recipeEntity;
     }
 
-    public RecipeProcess getOfProcess() {
+    public RecipeProcessEntity getOfProcess() {
         return ofProcess;
     }
 
-    public void setOfProcess(RecipeProcess ofProcess) {
+    public void setOfProcess(RecipeProcessEntity ofProcess) {
         this.ofProcess = ofProcess;
     }
 }

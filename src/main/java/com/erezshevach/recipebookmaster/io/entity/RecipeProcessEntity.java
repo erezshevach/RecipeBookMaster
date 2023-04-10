@@ -1,3 +1,5 @@
+package com.erezshevach.recipebookmaster.io.entity;
+
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -5,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Entity
-public class RecipeProcess {
+@Entity(name = "recipe_processes")
+public class RecipeProcessEntity {
 
     @Id
     @GeneratedValue
@@ -14,22 +16,21 @@ public class RecipeProcess {
     private int sequence;
     private String description;
     @OneToMany(mappedBy = "ofProcess", cascade = CascadeType.ALL)
-    private List<RecipeComponent> components = new ArrayList<>();
+    private List<RecipeComponentEntity> components = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "recipe_id")
-    private Recipe ofRecipe;
+    private RecipeEntity ofRecipe;
 
     // ---------- constructors ----------
-    public RecipeProcess() {
+    protected RecipeProcessEntity() {
     }
-
-    public RecipeProcess(int sequence, @NotNull String description, @NotNull Recipe recipe) {
+    public RecipeProcessEntity(int sequence, @NotNull String description, @NotNull RecipeEntity recipeEntity) {
         this.sequence = sequence;
         this.description = description;
-        this.ofRecipe = recipe;
+        this.ofRecipe = recipeEntity;
     }
-    public RecipeProcess(int sequence, @NotNull String description, List<RecipeComponent> components, @NotNull Recipe recipe) {
-        this(sequence, description, recipe);
+    public RecipeProcessEntity(int sequence, @NotNull String description, List<RecipeComponentEntity> components, @NotNull RecipeEntity recipeEntity) {
+        this(sequence, description, recipeEntity);
         this.components = components;
     }
 
@@ -39,7 +40,7 @@ public class RecipeProcess {
         s.append(sequence)
                 .append(": ")
                 .append(description);
-        for (RecipeComponent c : components) {
+        for (RecipeComponentEntity c : components) {
             if (c != null) {
                 s.append("\n").append(c.toString());
             }
@@ -72,19 +73,19 @@ public class RecipeProcess {
         this.description = description;
     }
 
-    public List<RecipeComponent> getComponents() {
+    public List<RecipeComponentEntity> getComponents() {
         return components;
     }
 
-    public void setComponents(List<RecipeComponent> components) {
+    public void setComponents(List<RecipeComponentEntity> components) {
         this.components = components;
     }
 
-    public Recipe getOfRecipe() {
+    public RecipeEntity getOfRecipe() {
         return ofRecipe;
     }
 
-    public void setOfRecipe(Recipe recipe) {
-        this.ofRecipe = recipe;
+    public void setOfRecipe(RecipeEntity recipeEntity) {
+        this.ofRecipe = recipeEntity;
     }
 }
