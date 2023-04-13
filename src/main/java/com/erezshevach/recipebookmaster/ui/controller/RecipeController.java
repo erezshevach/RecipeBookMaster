@@ -6,6 +6,7 @@ import com.erezshevach.recipebookmaster.ui.model.request.RecipeDetailsRequestMod
 import com.erezshevach.recipebookmaster.ui.model.response.RecipeResponseModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,12 +15,19 @@ public class RecipeController {
     @Autowired
     RecipeService recipeService;
 
-    @GetMapping
-    public String getRecipe() {
-        return "got some recipe";
+    @GetMapping(path="/{name}", produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public RecipeResponseModel getRecipe(@PathVariable String name) {
+        RecipeResponseModel response = new RecipeResponseModel();
+
+        RecipeDto recipeDto = recipeService.getRecipeByName(name);
+        BeanUtils.copyProperties(recipeDto, response);
+
+        return response;
     }
 
-    @PostMapping
+    @PostMapping(
+            consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @RequestMapping(method = RequestMethod.POST)
     public RecipeResponseModel createRecipe(@RequestBody RecipeDetailsRequestModel recipeDetails) {
         RecipeResponseModel response = new RecipeResponseModel();

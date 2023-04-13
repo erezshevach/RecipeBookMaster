@@ -36,9 +36,16 @@ public class RecipeProcessEntity {
 
     // ---------- methods ----------
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(sequence)
-                .append(": ")
+        StringBuilder s = new StringBuilder()
+                .append(sequence)
+                .append(". ")
+                .append(description);
+        return s.toString();
+    }
+    public String toStringDetailed() {
+        StringBuilder s = new StringBuilder()
+                .append(sequence)
+                .append(". ")
                 .append(description);
         for (RecipeComponentEntity c : components) {
             if (c != null) {
@@ -52,40 +59,34 @@ public class RecipeProcessEntity {
     public long getId() {
         return id;
     }
-
     private void setId(long id) {
         this.id = id;
     }
-
     public int getSequence() {
         return sequence;
     }
-
     public void setSequence(int sequence) {
         this.sequence = sequence;
     }
-
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
-
     public List<RecipeComponentEntity> getComponents() {
         return components;
     }
-
     public void setComponents(List<RecipeComponentEntity> components) {
         this.components = components;
     }
-
     public RecipeEntity getOfRecipe() {
         return ofRecipe;
     }
-
     public void setOfRecipe(RecipeEntity recipeEntity) {
         this.ofRecipe = recipeEntity;
+        for (RecipeComponentEntity c : getComponents()) {
+            c.setOfRecipe(recipeEntity);
+        }
     }
 }

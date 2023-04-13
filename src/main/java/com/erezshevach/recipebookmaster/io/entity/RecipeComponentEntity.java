@@ -52,55 +52,42 @@ public class RecipeComponentEntity {
     public long getId() {
         return id;
     }
-
     private void setId(long id) {
         this.id = id;
     }
-
     public String getIngredient() {
         return ingredient;
     }
-
     public void setIngredient(String ingredient) {
         this.ingredient = ingredient;
     }
-
     public String getState() {
         return state;
     }
-
     public void setState(String state) {
         this.state = state;
     }
-
     public double getQuantity() {
         return quantity;
     }
-
     public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
-
     public Uom getUom() {
         return uom;
     }
-
     public void setUom(Uom uom) {
         this.uom = uom;
     }
-
     public RecipeEntity getOfRecipe() {
         return ofRecipe;
     }
-
     public void setOfRecipe(RecipeEntity recipeEntity) {
         this.ofRecipe = recipeEntity;
     }
-
     public RecipeProcessEntity getOfProcess() {
         return ofProcess;
     }
-
     public void setOfProcess(RecipeProcessEntity ofProcess) {
         this.ofProcess = ofProcess;
     }

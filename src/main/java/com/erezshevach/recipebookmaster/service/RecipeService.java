@@ -4,7 +4,6 @@ import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 
 public interface RecipeService {
 
-    public RecipeDto createRecipe(RecipeDto recipeDtoIn);
-
-
+    RecipeDto createRecipe(RecipeDto recipeDtoIn);
+    RecipeDto getRecipeByName(String name);
 }

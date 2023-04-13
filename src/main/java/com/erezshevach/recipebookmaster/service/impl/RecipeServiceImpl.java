@@ -18,36 +18,71 @@ import java.util.List;
 public class RecipeServiceImpl implements RecipeService {
     @Autowired
     RecipeRepository recipeRepository;
-
+    @Override
     public RecipeDto createRecipe(RecipeDto recipeDtoIn) {
+        transformInputToProcessesAndComponents(recipeDtoIn);
+        RecipeEntity recipeEntity = new RecipeEntity(recipeDtoIn.getName(), recipeDtoIn.getProcesses());
+
+        RecipeEntity storedRecipeEntity = recipeRepository.save(recipeEntity);
         RecipeDto recipeDtoOut = new RecipeDto();
-
-            RecipeEntity recipeEntity = new RecipeEntity(recipeDtoIn.getName());
-            recipeEntity = updateProcessesAndComponents(recipeEntity, recipeDtoIn.getProcesses(), recipeDtoIn.getIngredients(), recipeDtoIn.getStates(), recipeDtoIn.getQuantities(), recipeDtoIn.getUnits(), recipeDtoIn.getSequences());
-
-            RecipeEntity storedRecipeEntity =  recipeRepository.save(recipeEntity);
-            BeanUtils.copyProperties(storedRecipeEntity, recipeDtoOut);
+        BeanUtils.copyProperties(storedRecipeEntity, recipeDtoOut);
+        transformProcessesAndComponentsToOutput(recipeDtoOut);
 
         return recipeDtoOut;
     }
-    private static RecipeEntity updateProcessesAndComponents(RecipeEntity recipeEntity, String[] input_processes, String[] ingredients, String[] states, double[] qtys, String[] uoms, int[] seqs) {
-        RecipeProcessEntity[] processes = new RecipeProcessEntity[input_processes.length];
-        for (int i = 0; i < input_processes.length; i++){
-            String description = input_processes[i] != null ? input_processes[i] : "";
-            processes[i] = new RecipeProcessEntity(i + 1, description , recipeEntity);
+    @Override
+    public RecipeDto getRecipeByName(String name) {
+        RecipeDto recipeDto = new RecipeDto();
+        RecipeEntity recipeEntity = recipeRepository.findRecipeByName(name);
+        if (recipeEntity == null) throw new RuntimeException("There is no recipe named \"" + name + "\"");
+        BeanUtils.copyProperties(recipeEntity, recipeDto);
+        transformProcessesAndComponentsToOutput(recipeDto);
+        return recipeDto;
+    }
+
+    private void transformInputToProcessesAndComponents(RecipeDto recipeDto) {
+        String[] processes_input = recipeDto.getProcesses_input();
+        RecipeProcessEntity[] processes = new RecipeProcessEntity[processes_input.length];
+        for (int i = 0; i < processes_input.length; i++) {
+            String description = processes_input[i] != null ? processes_input[i] : "";
+            processes[i] = new RecipeProcessEntity(i + 1, description, null);
         }
 
-        for (int i = 0; i < ingredients.length; i++){
-            if (seqs[i] > processes.length) {
+        String[] ingredients = recipeDto.getIngredients();
+        double[] quantities = recipeDto.getQuantities();
+        String[] units = recipeDto.getUnits();
+        String[] states = recipeDto.getStates();
+        int[] sequences = recipeDto.getSequences();
+
+        for (int i = 0; i < ingredients.length; i++) {
+            if (sequences[i] > processes.length) {
                 //alert
             }
-            RecipeProcessEntity relatedProcess = processes[seqs[i] - 1];
-            RecipeComponentEntity component = new RecipeComponentEntity(ingredients[i], states[i], qtys[i], Uom.getByLabel(uoms[i]), recipeEntity, relatedProcess);
+            RecipeProcessEntity relatedProcess = processes[sequences[i] - 1];
+            RecipeComponentEntity component = new RecipeComponentEntity(ingredients[i], states[i], quantities[i], Uom.getByLabel(units[i]), null, relatedProcess);
             List<RecipeComponentEntity> components = relatedProcess.getComponents();
             components.add(component);
             relatedProcess.setComponents(components);
         }
-        recipeEntity.setProcesses(Arrays.asList(processes));
-        return recipeEntity;
+        recipeDto.setProcesses(Arrays.asList(processes));
+    }
+    private void transformProcessesAndComponentsToOutput(RecipeDto recipeDto){
+        StringBuilder processesSb = new StringBuilder();
+        StringBuilder componentsSb = new StringBuilder();
+
+        for (RecipeProcessEntity p : recipeDto.getProcesses()) {
+            if (p != null) {
+                processesSb.append(p.toString()).append("\n");
+                for( RecipeComponentEntity c : p.getComponents()) {
+                    componentsSb.append("(")
+                            .append(p.getSequence())
+                            .append(") ")
+                            .append(c.toString())
+                            .append("\n");
+                }
+            }
+        }
+        recipeDto.setProcesses_output(processesSb.toString());
+        recipeDto.setComponents_output(componentsSb.toString());
     }
 }

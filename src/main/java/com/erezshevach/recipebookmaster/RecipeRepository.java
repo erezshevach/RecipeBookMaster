@@ -9,10 +9,7 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends CrudRepository<RecipeEntity, Long> {
 
-    List<RecipeEntity> getRecipeByName(String Name);
+    RecipeEntity findRecipeByName(String Name);
 
-    List<String> findNamesByNameContains(String partialName);
-
-    boolean existsRecipeByName(String name);
 
 }
