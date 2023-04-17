@@ -2,8 +2,8 @@ package com.erezshevach.recipebookmaster.ui.model.response;
 
 public class RecipeResponseModel {
     private String name;
-    private String processes_output;
-    private String components_output;
+    private String[] processes_output;
+    private String[] components_output;
     private Integer kCalPer100g;
     private boolean containsGluten;
     private boolean containsDairy;
@@ -20,16 +20,16 @@ public class RecipeResponseModel {
     public void setName(String name) {
         this.name = name;
     }
-    public String getProcesses_output() {
+    public String[] getProcesses_output() {
         return processes_output;
     }
-    public void setProcesses_output(String processes_output) {
+    public void setProcesses_output(String[] processes_output) {
         this.processes_output = processes_output;
     }
-    public String getComponents_output() {
+    public String[] getComponents_output() {
         return components_output;
     }
-    public void setComponents_output(String components_output) {
+    public void setComponents_output(String[] components_output) {
         this.components_output = components_output;
     }
     public Integer getkCalPer100g() {

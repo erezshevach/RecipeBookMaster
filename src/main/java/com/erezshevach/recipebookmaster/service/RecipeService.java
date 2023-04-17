@@ -6,4 +6,5 @@ public interface RecipeService {
 
     RecipeDto createRecipe(RecipeDto recipeDtoIn);
     RecipeDto getRecipeByName(String name);
+    void deleteRecipe(String name);
 }

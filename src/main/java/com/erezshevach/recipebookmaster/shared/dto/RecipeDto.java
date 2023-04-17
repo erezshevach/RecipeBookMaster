@@ -17,8 +17,8 @@ public class RecipeDto implements Serializable {
     private int[] sequences;
     private String[] processes_input;
     private List<RecipeProcessEntity> processes;
-    private String processes_output;
-    private String components_output;
+    private String[] processes_output;
+    private String[] components_output;
     private Integer kCalPer100g;
     private boolean containsGluten;
     private boolean containsDairy;
@@ -77,16 +77,16 @@ public class RecipeDto implements Serializable {
     public void setProcesses(List<RecipeProcessEntity> processes) {
         this.processes = processes;
     }
-    public String getProcesses_output() {
+    public String[] getProcesses_output() {
         return processes_output;
     }
-    public void setProcesses_output(String processes_output) {
+    public void setProcesses_output(String[] processes_output) {
         this.processes_output = processes_output;
     }
-    public String getComponents_output() {
+    public String[] getComponents_output() {
         return components_output;
     }
-    public void setComponents_output(String components_output) {
+    public void setComponents_output(String[] components_output) {
         this.components_output = components_output;
     }
     public Integer getkCalPer100g() {
