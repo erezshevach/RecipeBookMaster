@@ -29,7 +29,7 @@ public class RecipeComponentEntity {
     protected RecipeComponentEntity() {
     }
 
-    public RecipeComponentEntity(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, @NotNull RecipeEntity recipeEntity, @NotNull RecipeProcessEntity process) {
+    public RecipeComponentEntity(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, RecipeEntity recipeEntity, RecipeProcessEntity process) {
         this.ingredient = ingredient;
         this.state = state;
         this.quantity = quantity;

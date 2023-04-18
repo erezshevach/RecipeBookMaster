@@ -11,6 +11,8 @@ import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.ui.model.response.ErrorMessages;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,8 +21,13 @@ import java.util.List;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
-    @Autowired
     RecipeRepository recipeRepository;
+
+    @Autowired
+    public RecipeServiceImpl(RecipeRepository recipeRepository) {
+        this.recipeRepository = recipeRepository;
+    }
+
     @Override
     public RecipeDto createRecipe(RecipeDto recipeDtoIn) {
         transformInputToProcessesAndComponents(recipeDtoIn);
@@ -41,6 +48,21 @@ public class RecipeServiceImpl implements RecipeService {
         BeanUtils.copyProperties(recipeEntity, recipeDto);
         transformProcessesAndComponentsToOutput(recipeDto);
         return recipeDto;
+    }
+
+    @Override
+    public List<RecipeDto> getRecipesByPartialName(String partialName, int page, int limit) {
+        List<RecipeDto> result = new ArrayList<>();
+        if (page > 0) page -=1;
+        Pageable pageable = PageRequest.of(page, limit);
+        List<RecipeEntity> recipes = recipeRepository.findRecipesByNameContains(pageable, partialName);
+        for (RecipeEntity recipe : recipes) {
+            RecipeDto recipeDto = new RecipeDto();
+            BeanUtils.copyProperties(recipe, recipeDto);
+            transformProcessesAndComponentsToOutput(recipeDto);
+            result.add(recipeDto);
+        }
+        return result;
     }
 
     @Override
@@ -67,7 +89,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         for (int i = 0; i < ingredients.length; i++) {
             if (sequences[i] > processes.length) {
-                //alert
+                throw new RecipeException(recipeDto.getName(), ErrorMessages.INVALID_INPUT.getMessage() + ", component sequence for " + ingredients[i] + " does not have a matching process sequence.");
             }
             RecipeProcessEntity relatedProcess = processes[sequences[i] - 1];
             RecipeComponentEntity component = new RecipeComponentEntity(ingredients[i], states[i], quantities[i], Uom.getByLabel(units[i]), null, relatedProcess);

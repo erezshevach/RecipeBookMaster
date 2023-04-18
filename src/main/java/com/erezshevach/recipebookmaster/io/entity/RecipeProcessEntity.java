@@ -24,23 +24,19 @@ public class RecipeProcessEntity {
     // ---------- constructors ----------
     protected RecipeProcessEntity() {
     }
-    public RecipeProcessEntity(int sequence, @NotNull String description, @NotNull RecipeEntity recipeEntity) {
+    public RecipeProcessEntity(int sequence, @NotNull String description, RecipeEntity recipeEntity) {
         this.sequence = sequence;
         this.description = description;
         this.ofRecipe = recipeEntity;
     }
-    public RecipeProcessEntity(int sequence, @NotNull String description, List<RecipeComponentEntity> components, @NotNull RecipeEntity recipeEntity) {
+    public RecipeProcessEntity(int sequence, @NotNull String description, List<RecipeComponentEntity> components, RecipeEntity recipeEntity) {
         this(sequence, description, recipeEntity);
         this.components = components;
     }
 
     // ---------- methods ----------
     public String toString() {
-        StringBuilder s = new StringBuilder()
-                .append(sequence)
-                .append(". ")
-                .append(description);
-        return s.toString();
+        return sequence + ". " + description;
     }
     public String toStringDetailed() {
         StringBuilder s = new StringBuilder()
@@ -49,7 +45,7 @@ public class RecipeProcessEntity {
                 .append(description);
         for (RecipeComponentEntity c : components) {
             if (c != null) {
-                s.append("\n").append(c.toString());
+                s.append("\n").append(c);
             }
         }
         return s.toString();

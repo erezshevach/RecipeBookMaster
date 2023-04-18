@@ -1,6 +1,5 @@
 package com.erezshevach.recipebookmaster.ui.controller;
 
-import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
 import com.erezshevach.recipebookmaster.recipebookmaster.exceptions.RecipeException;
 import com.erezshevach.recipebookmaster.service.RecipeService;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
@@ -11,11 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("recipes")
 public class RecipeController {
-    @Autowired
     RecipeService recipeService;
+
+    @Autowired
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
 
     @GetMapping(path="/{name}", produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public RecipeResponseModel getRecipe(@PathVariable String name) {
@@ -24,6 +30,21 @@ public class RecipeController {
         RecipeDto recipeDto = recipeService.getRecipeByName(name);
         BeanUtils.copyProperties(recipeDto, response);
 
+        return response;
+    }
+
+    @GetMapping(produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<RecipeResponseModel> getRecipes(@RequestParam(value = "pname", defaultValue = "") String partialName,
+                                                @RequestParam(value = "page", defaultValue = "1") int page,
+                                                @RequestParam(value = "limit", defaultValue = "25") int limit) {
+        List<RecipeResponseModel> response = new ArrayList<>();
+
+        List<RecipeDto> recipeDtos = recipeService.getRecipesByPartialName(partialName, page, limit);
+        for (RecipeDto recipeDto : recipeDtos) {
+            RecipeResponseModel res = new RecipeResponseModel();
+            BeanUtils.copyProperties(recipeDto, res);
+            response.add(res);
+        }
         return response;
     }
 
