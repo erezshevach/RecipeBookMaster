@@ -2,19 +2,21 @@ package com.erezshevach.recipebookmaster.io.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "recipes")
 public class RecipeEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 24L;
+
     @Id
-    @GeneratedValue//(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
-    @Column(nullable = false)
     @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
     private List<RecipeProcessEntity> processes = new ArrayList<>();
     //@ManyToMany
@@ -34,10 +36,10 @@ public class RecipeEntity implements Serializable {
         this.name = name;
     }
 
-    public  RecipeEntity(String name, List<RecipeProcessEntity> processes) {
+    public RecipeEntity(String name, List<RecipeProcessEntity> processes) {
         this.name = name;
 
-        for(RecipeProcessEntity p : processes) {
+        for (RecipeProcessEntity p : processes) {
             p.setOfRecipe(this);
         }
 
@@ -116,54 +118,71 @@ public class RecipeEntity implements Serializable {
     public Long getId() {
         return id;
     }
+
     private void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
-    private void setName(String name) {
+
+    public void setName(String name) {
         this.name = name;
     }
+
     public List<RecipeProcessEntity> getProcesses() {
         return processes;
     }
+
     public void setProcesses(List<RecipeProcessEntity> processes) {
         this.processes = processes;
     }
+
     public Integer getkCalPer100g() {
         return kCalPer100g;
     }
+
     public void setkCalPer100g(Integer kCalPer100g) {
         this.kCalPer100g = kCalPer100g;
     }
+
     public boolean isContainsGluten() {
         return containsGluten;
     }
+
     public void setContainsGluten(boolean containsGluten) {
         this.containsGluten = containsGluten;
     }
+
     public boolean isContainsDairy() {
         return containsDairy;
     }
+
     public void setContainsDairy(boolean containsDairy) {
         this.containsDairy = containsDairy;
     }
+
     public boolean isContainsNuts() {
         return containsNuts;
     }
+
     public void setContainsNuts(boolean containsNuts) {
         this.containsNuts = containsNuts;
     }
+
     public boolean isContainsPeanuts() {
         return containsPeanuts;
     }
+
     public void setContainsPeanuts(boolean containsPeanuts) {
         this.containsPeanuts = containsPeanuts;
     }
+
     public boolean isVegan() {
         return vegan;
     }
+
     public void setVegan(boolean vegan) {
         this.vegan = vegan;
     }

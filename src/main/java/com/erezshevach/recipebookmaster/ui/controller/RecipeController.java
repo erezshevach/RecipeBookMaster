@@ -3,9 +3,9 @@ package com.erezshevach.recipebookmaster.ui.controller;
 import com.erezshevach.recipebookmaster.recipebookmaster.exceptions.RecipeException;
 import com.erezshevach.recipebookmaster.service.RecipeService;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
-import com.erezshevach.recipebookmaster.ui.model.request.RecipeDetailsRequestModel;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeRequestModel;
 import com.erezshevach.recipebookmaster.ui.model.response.*;
-import org.springframework.beans.BeanUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,51 +23,43 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @GetMapping(path="/{name}", produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(path = "/{name}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public RecipeResponseModel getRecipe(@PathVariable String name) {
-        RecipeResponseModel response = new RecipeResponseModel();
-
         RecipeDto recipeDto = recipeService.getRecipeByName(name);
-        BeanUtils.copyProperties(recipeDto, response);
 
-        return response;
+        ModelMapper mapper = new ModelMapper();
+        return mapper.map(recipeDto, RecipeResponseModel.class);
     }
 
-    @GetMapping(produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<RecipeResponseModel> getRecipes(@RequestParam(value = "pname", defaultValue = "") String partialName,
                                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                                 @RequestParam(value = "limit", defaultValue = "25") int limit) {
-        List<RecipeResponseModel> response = new ArrayList<>();
-
         List<RecipeDto> recipeDtos = recipeService.getRecipesByPartialName(partialName, page, limit);
+
+        List<RecipeResponseModel> response = new ArrayList<>();
+        ModelMapper mapper = new ModelMapper();
         for (RecipeDto recipeDto : recipeDtos) {
-            RecipeResponseModel res = new RecipeResponseModel();
-            BeanUtils.copyProperties(recipeDto, res);
+            RecipeResponseModel res = mapper.map(recipeDto, RecipeResponseModel.class);
             response.add(res);
         }
         return response;
     }
 
     @PostMapping(
-            consumes= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-            produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @RequestMapping(method = RequestMethod.POST)
-    public RecipeResponseModel createRecipe(@RequestBody RecipeDetailsRequestModel recipeDetails) {
-        if (recipeDetails.getProcesses_input() == null ||
-                recipeDetails.getIngredients() == null ||
-                recipeDetails.getQuantities() == null ||
-                recipeDetails.getUnits() == null ||
-                recipeDetails.getStates() == null ||
-                recipeDetails.getSequences() == null) {
+    public RecipeResponseModel createRecipe(@RequestBody RecipeRequestModel recipeDetails) {
+        if (recipeDetails.getName() == null ||
+                recipeDetails.getProcesses() == null) {
             throw new RecipeException(recipeDetails.getName(), ErrorMessages.MISSING_REQUIRED_FIELD.getMessage());
         }
 
-        RecipeDto recipeDtoIn = new RecipeDto();
-        BeanUtils.copyProperties(recipeDetails, recipeDtoIn);
+        ModelMapper mapper = new ModelMapper();
+        RecipeDto recipeDtoIn = mapper.map(recipeDetails, RecipeDto.class);
         RecipeDto recipeDtoOut = recipeService.createRecipe(recipeDtoIn);
-        RecipeResponseModel response = new RecipeResponseModel();
-        BeanUtils.copyProperties(recipeDtoOut, response);
-        return response;
+        return mapper.map(recipeDtoOut, RecipeResponseModel.class);
     }
 
     @PutMapping
@@ -75,7 +67,7 @@ public class RecipeController {
         return "updated some recipe";
     }
 
-    @DeleteMapping(path="/{name}", produces= {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @DeleteMapping(path = "/{name}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public OperationStatusResponseModel deleteRecipe(@PathVariable String name) {
         OperationStatusResponseModel response = new OperationStatusResponseModel();
         response.setEntityName(name);
