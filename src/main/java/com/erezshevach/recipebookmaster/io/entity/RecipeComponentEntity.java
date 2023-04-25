@@ -1,6 +1,7 @@
 package com.erezshevach.recipebookmaster.io.entity;
 
 import com.erezshevach.recipebookmaster.Uom;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +31,22 @@ public class RecipeComponentEntity implements Serializable {
     @JoinColumn(name = "recipe_process_id")
     private RecipeProcessEntity ofProcess;
 
+
     // ---------- constructors ----------
+
+
     protected RecipeComponentEntity() {
     }
 
-    public RecipeComponentEntity(@NotNull String ingredient, String state, double quantity, @NotNull Uom uom, RecipeEntity recipeEntity, RecipeProcessEntity process) {
+    public RecipeComponentEntity(double quantity, Uom uom, String ingredient, String state) {
+        this(quantity, uom, ingredient, state, null, null);
+    }
+
+    public RecipeComponentEntity(double quantity, @NotNull Uom uom, @NotNull String ingredient, String state, RecipeProcessEntity process, RecipeEntity recipeEntity) {
+        if (quantity <= 0) throw new IllegalArgumentException("Component's quantity cannot be 0 or negative.");
+        if (uom == null) throw new IllegalArgumentException("Component's UOM is required.");
+        if (ingredient == null || ingredient.isEmpty() || ingredient.isBlank()) throw new IllegalArgumentException("Component's ingredient is required.");
+
         this.ingredient = ingredient;
         this.state = state;
         this.quantity = quantity;
@@ -43,7 +55,10 @@ public class RecipeComponentEntity implements Serializable {
         this.ofProcess = process;
     }
 
+
     // ---------- methods ----------
+
+
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(quantity).append(" ").append(uom).append(" ").append(ingredient);
@@ -53,7 +68,24 @@ public class RecipeComponentEntity implements Serializable {
         return s.toString();
     }
 
+    public boolean similar(RecipeComponentEntity other) {
+        return this.quantity == other.getQuantity() &&
+                this.uom == other.getUom() &&
+                this.ingredient == other.getIngredient() &&
+                this.state == other.getState();
+    }
+
+    public boolean similar(RecipeComponentDto other) {
+        return this.quantity == other.getQuantity() &&
+                this.uom == other.getUom() &&
+                this.ingredient == other.getIngredient() &&
+                this.state == other.getState();
+    }
+
+
     // ---------- getters/setters ----------
+
+
     public long getId() {
         return id;
     }

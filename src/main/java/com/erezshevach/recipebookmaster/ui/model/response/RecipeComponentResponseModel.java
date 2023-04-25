@@ -1,6 +1,9 @@
 package com.erezshevach.recipebookmaster.ui.model.response;
 
 import com.erezshevach.recipebookmaster.Uom;
+import com.erezshevach.recipebookmaster.io.entity.RecipeComponentEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeComponentRequestModel;
 
 public class RecipeComponentResponseModel {
 
@@ -12,7 +15,34 @@ public class RecipeComponentResponseModel {
     private Integer relatedProcessSequence;
 
 
-    //-------------------getters & setters ----------------------------
+    //------------------- methods ----------------------------
+
+
+
+    public boolean similar(RecipeComponentDto other) {
+        return this.quantity == other.getQuantity() &&
+                this.uom == other.getUom() &&
+                this.ingredient == other.getIngredient() &&
+                this.state == other.getState();
+    }
+
+    public boolean similar(RecipeComponentResponseModel other) {
+        return this.quantity == other.getQuantity() &&
+                this.uom == other.getUom() &&
+                this.ingredient == other.getIngredient() &&
+                this.state == other.getState();
+    }
+
+    public boolean similar(RecipeComponentRequestModel other) {
+        return this.quantity == other.getQuantity() &&
+                this.uom == other.getUom() &&
+                this.ingredient == other.getIngredient() &&
+                this.state == other.getState();
+    }
+
+
+
+    //------------------- getters & setters ----------------------------
 
 
     public String getComponentPid() {

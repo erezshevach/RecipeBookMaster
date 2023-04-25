@@ -1,5 +1,7 @@
 package com.erezshevach.recipebookmaster.io.entity;
 
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,22 +30,43 @@ public class RecipeProcessEntity implements Serializable {
     @JoinColumn(name = "recipe_id")
     private RecipeEntity ofRecipe;
 
+
     // ---------- constructors ----------
+
+
     protected RecipeProcessEntity() {
     }
 
+    public RecipeProcessEntity(int sequence, String description) {
+        this(sequence, description, null, null);
+    }
+
     public RecipeProcessEntity(int sequence, @NotNull String description, RecipeEntity recipeEntity) {
-        this.sequence = sequence;
-        this.description = description;
-        this.ofRecipe = recipeEntity;
+        this(sequence, description, null, recipeEntity);
     }
 
     public RecipeProcessEntity(int sequence, @NotNull String description, List<RecipeComponentEntity> components, RecipeEntity recipeEntity) {
-        this(sequence, description, recipeEntity);
-        this.components = components;
+        if (sequence <= 0) throw new IllegalArgumentException("Process sequence cannot be 0 or negative.");
+        if (description == null || description.isEmpty() || description.isBlank())
+            throw new IllegalArgumentException("Process description is required.");
+
+        this.sequence = sequence;
+        this.description = description;
+        this.ofRecipe = recipeEntity;
+
+        if (components != null) {
+            for (RecipeComponentEntity c : components) {
+                c.setOfProcess(this);
+                c.setOfRecipe(recipeEntity);
+            }
+            this.components = components;
+        }
     }
 
+
     // ---------- methods ----------
+
+
     public String toString() {
         return sequence + ". " + description;
     }
@@ -61,7 +84,48 @@ public class RecipeProcessEntity implements Serializable {
         return s.toString();
     }
 
+    public boolean similar(RecipeProcessEntity other) {
+        List<RecipeComponentEntity> otherComponents = other.getComponents();
+        int componentsSize = components != null ? components.size() : -1;
+        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
+        boolean componentsSimilarity = componentsSize == otherComponentsSize;
+        if (componentsSimilarity && componentsSize > 0) {
+            for (int i = 0; i < componentsSize; i++) {
+                if (!components.get(i).similar(otherComponents.get(i))){
+                    componentsSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.sequence == other.getSequence() &&
+                this.description == other.getDescription() &&
+                componentsSimilarity;
+    }
+
+    public boolean similar(RecipeProcessDto other) {
+        List<RecipeComponentDto> otherComponents = other.getComponents();
+        int componentsSize = components != null ? components.size() : -1;
+        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
+        boolean componentsSimilarity = componentsSize == otherComponentsSize;
+        if (componentsSimilarity && componentsSize > 0) {
+            for (int i = 0; i < componentsSize; i++) {
+                if (!components.get(i).similar(otherComponents.get(i))){
+                    componentsSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.sequence == other.getSequence() &&
+                this.description == other.getDescription() &&
+                componentsSimilarity;
+    }
+
+
     // ---------- getters/setters ----------
+
+
     public long getId() {
         return id;
     }
@@ -99,6 +163,12 @@ public class RecipeProcessEntity implements Serializable {
     }
 
     public void setComponents(List<RecipeComponentEntity> components) {
+        if (components != null) {
+            for (RecipeComponentEntity c : components) {
+                c.setOfProcess(this);
+                c.setOfRecipe(this.ofRecipe);
+            }
+        }
         this.components = components;
     }
 
@@ -108,8 +178,10 @@ public class RecipeProcessEntity implements Serializable {
 
     public void setOfRecipe(RecipeEntity recipeEntity) {
         this.ofRecipe = recipeEntity;
-        for (RecipeComponentEntity c : getComponents()) {
-            c.setOfRecipe(recipeEntity);
+        if (getComponents() != null) {
+            for (RecipeComponentEntity c : getComponents()) {
+                c.setOfRecipe(recipeEntity);
+            }
         }
     }
 }

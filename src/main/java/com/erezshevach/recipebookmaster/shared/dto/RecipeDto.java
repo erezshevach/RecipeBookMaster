@@ -1,5 +1,12 @@
 package com.erezshevach.recipebookmaster.shared.dto;
 
+import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
+import com.erezshevach.recipebookmaster.io.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeProcessRequestModel;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeRequestModel;
+import com.erezshevach.recipebookmaster.ui.model.response.RecipeProcessResponseModel;
+import com.erezshevach.recipebookmaster.ui.model.response.RecipeResponseModel;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -17,17 +24,91 @@ public class RecipeDto implements Serializable {
     private boolean containsPeanuts;
     private boolean vegan;
 
-//    private String[] ingredients;
-//    private String[] states;
-//    private double[] quantities;
-//    private String[] units;
-//    private int[] sequences;
-//    private String[] processes_input;
-//    private String[] processes_output;
-//    private String[] components_output;
+
+    //------------------- methods ----------------------------
 
 
-    //-------------------getters & setters ----------------------------
+    public String toString() {
+        StringBuilder s = new StringBuilder()
+                .append(name);
+        for (RecipeProcessDto p : processes) {
+            if (p != null) {
+                s.append("\n").append(p.toStringDetailed());
+            }
+        }
+        return s.toString();
+    }
+
+    public boolean similar(RecipeEntity other) {
+        List<RecipeProcessEntity> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeDto other) {
+        List<RecipeProcessDto> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeResponseModel other) {
+        List<RecipeProcessResponseModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeRequestModel other) {
+        List<RecipeProcessRequestModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+
+    //------------------- getters & setters ----------------------------
 
 
     public String getName() {
@@ -93,68 +174,4 @@ public class RecipeDto implements Serializable {
     public void setVegan(boolean vegan) {
         this.vegan = vegan;
     }
-
-//    public String[] getIngredients() {
-//        return ingredients;
-//    }
-//
-//    public void setIngredients(String[] ingredients) {
-//        this.ingredients = ingredients;
-//    }
-//
-//    public String[] getStates() {
-//        return states;
-//    }
-//
-//    public void setStates(String[] states) {
-//        this.states = states;
-//    }
-//
-//    public double[] getQuantities() {
-//        return quantities;
-//    }
-//
-//    public void setQuantities(double[] quantities) {
-//        this.quantities = quantities;
-//    }
-//
-//    public String[] getUnits() {
-//        return units;
-//    }
-//
-//    public void setUnits(String[] units) {
-//        this.units = units;
-//    }
-//
-//    public int[] getSequences() {
-//        return sequences;
-//    }
-//
-//    public void setSequences(int[] sequences) {
-//        this.sequences = sequences;
-//    }
-//
-//    public String[] getProcesses_input() {
-//        return processes_input;
-//    }
-//
-//    public void setProcesses_input(String[] processes) {
-//        this.processes_input = processes;
-//    }
-//
-//    public String[] getProcesses_output() {
-//        return processes_output;
-//    }
-//
-//    public void setProcesses_output(String[] processes_output) {
-//        this.processes_output = processes_output;
-//    }
-//
-//    public String[] getComponents_output() {
-//        return components_output;
-//    }
-//
-//    public void setComponents_output(String[] components_output) {
-//        this.components_output = components_output;
-//    }
 }

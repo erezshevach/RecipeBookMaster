@@ -1,5 +1,12 @@
 package com.erezshevach.recipebookmaster.ui.model.request;
 
+import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
+import com.erezshevach.recipebookmaster.io.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
+import com.erezshevach.recipebookmaster.ui.model.response.RecipeProcessResponseModel;
+import com.erezshevach.recipebookmaster.ui.model.response.RecipeResponseModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +23,62 @@ public class RecipeRequestModel {
 //    private int[] sequences;
 
 
-    //-------------------getters & setters ----------------------------
+    //------------------- methods ----------------------------
+
+
+    public boolean similar(RecipeDto other) {
+        List<RecipeProcessDto> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeResponseModel other) {
+        List<RecipeProcessResponseModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeRequestModel other) {
+        List<RecipeProcessRequestModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+
+    //------------------- getters & setters ----------------------------
 
 
     public String getName() {

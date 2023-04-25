@@ -1,5 +1,12 @@
 package com.erezshevach.recipebookmaster.ui.model.response;
 
+import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
+import com.erezshevach.recipebookmaster.io.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeProcessRequestModel;
+import com.erezshevach.recipebookmaster.ui.model.request.RecipeRequestModel;
+
 import java.util.List;
 
 public class RecipeResponseModel {
@@ -12,11 +19,63 @@ public class RecipeResponseModel {
     private boolean containsPeanuts;
     private boolean vegan;
 
-//    private String[] processes_output;
-//    private String[] components_output;
+
+    //------------------- methods ----------------------------
 
 
-    //-------------------getters & setters ----------------------------
+    public boolean similar(RecipeDto other) {
+        List<RecipeProcessDto> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeResponseModel other) {
+        List<RecipeProcessResponseModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+    public boolean similar(RecipeRequestModel other) {
+        List<RecipeProcessRequestModel> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
+
+
+    //------------------- getters & setters ----------------------------
 
 
     public String getName() {
@@ -82,21 +141,4 @@ public class RecipeResponseModel {
     public void setVegan(boolean vegan) {
         this.vegan = vegan;
     }
-
-//    public String[] getProcesses_output() {
-//        return processes_output;
-//    }
-//
-//    public void setProcesses_output(String[] processes_output) {
-//        this.processes_output = processes_output;
-//    }
-//
-//    public String[] getComponents_output() {
-//        return components_output;
-//    }
-//
-//    public void setComponents_output(String[] components_output) {
-//        this.components_output = components_output;
-//    }
-
 }

@@ -1,6 +1,10 @@
 package com.erezshevach.recipebookmaster.io.entity;
 
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -28,27 +32,33 @@ public class RecipeEntity implements Serializable {
     private boolean containsPeanuts = false;
     private boolean vegan = false;
 
+
     // ---------- constructors ----------
+
+
     protected RecipeEntity() {
     }
 
-    public RecipeEntity(String name) {
+    public RecipeEntity(@NotNull String name) {
+        if (name == null || name.isEmpty() || name.isBlank()) throw new IllegalArgumentException("Recipe name is required");
+
         this.name = name;
     }
 
-    public RecipeEntity(String name, List<RecipeProcessEntity> processes) {
-        this.name = name;
+    public RecipeEntity(@NotNull String name, List<RecipeProcessEntity> processes) {
+        this(name);
 
-        for (RecipeProcessEntity p : processes) {
-            p.setOfRecipe(this);
+        if (processes != null) {
+            for (RecipeProcessEntity p : processes) {
+                p.setOfRecipe(this);
+            }
+            this.processes = processes;
         }
-
-        this.processes = processes;
-
     }
 
 
     // ---------- methods ----------
+
 
     public String toString() {
         StringBuilder s = new StringBuilder()
@@ -61,65 +71,51 @@ public class RecipeEntity implements Serializable {
             }
         }
         return s.toString();
-
     }
 
-//    public static boolean addRecipe(RecipeEntity recipeEntity, EntityManager pContext) {
-//        boolean success = false;
-//        if (isRecipeNameExists(recipeEntity.getName(), pContext)) {
-//            System.out.println("recipe " + recipeEntity.getName() + " already exsists");
-//        } else {
-//            DbOperations.insertObject(recipeEntity, pContext);
-//            success = true;
-//        }
-//        return success;
-//    }
-//
-//    public static Boolean isRecipeNameExists(String name, EntityManager pContext) throws IllegalArgumentException {
-//        return !pContext.createQuery("select name from RecipeEntity where name = :n", String.class).setParameter("n", name).getResultList().isEmpty();
-//    }
-//
-//    public static List<String> getRecipeNamesListByPartialName(String name, EntityManager pContext) throws IllegalArgumentException {
-//        String validNames = "%" + name + "%";
-//        return pContext.createQuery("select name from RecipeEntity where name like :n", String.class).setParameter("n", validNames).getResultList();
-//    }
-//
-//    /**
-//     * returns the first recipe with the matching name, or null, if none such recipe exists.
-//     */
-//    public static RecipeEntity getRecipeByName(String name, EntityManager pContext) throws IllegalArgumentException {
-//        RecipeEntity recipeEntity = null;
-//        List<RecipeEntity> results = pContext.createQuery("from RecipeEntity where name = :n", RecipeEntity.class).setParameter("n", name).getResultList();
-//        if (!results.isEmpty()) {
-//            recipeEntity = results.get(0);
-//        }
-//        return recipeEntity;
-//    }
+    public boolean similar(RecipeEntity other) {
+        List<RecipeProcessEntity> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
 
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
 
-    //public static void getRecipeNamesListByAttribute() {}
+    public boolean similar(RecipeDto other) {
+        List<RecipeProcessDto> otherProcesses = other.getProcesses();
+        int processesSize = processes != null ? processes.size() : -1;
+        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
+        boolean processesSimilarity = processesSize == otherProcessesSize;
+        if (processesSimilarity && processesSize > 0) {
+            for (int i = 0; i < processesSize; i++) {
+                if (!processes.get(i).similar(otherProcesses.get(i))){
+                    processesSimilarity = false;
+                    break;
+                }
+            }
 
-    //public static void getRecipeNamesListByIngredient() {}
+        }
+        return this.name == other.getName() && processesSimilarity;
+    }
 
-    //public static void filterRecipesListByAttribute() {}
-
-    //    public void calculateContainsDairy(Predicate<Ingredient> getter) {
-//        boolean res = false;
-//        res = processes.stream()
-//                .flatMap(process->process.getProcessComponents().stream())
-//                .map(RecipeComponent::getIngredient)
-//                .filter(e->e.getClass().equals(Ingredient.class))
-//                .map(i->(Ingredient)i)
-//                .anyMatch(getter);
-//        this.containsDairy = res;
-//    }
 
     //-------------------getters & setters ----------------------------
+
+
     public Long getId() {
         return id;
     }
 
-    private void setId(Long id) {
+    protected void setId(Long id) {
         this.id = id;
     }
 
@@ -136,6 +132,11 @@ public class RecipeEntity implements Serializable {
     }
 
     public void setProcesses(List<RecipeProcessEntity> processes) {
+        if (processes != null) {
+            for (RecipeProcessEntity p : processes) {
+                p.setOfRecipe(this);
+            }
+        }
         this.processes = processes;
     }
 
