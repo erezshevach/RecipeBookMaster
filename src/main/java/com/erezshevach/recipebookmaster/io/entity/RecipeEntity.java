@@ -1,6 +1,5 @@
 package com.erezshevach.recipebookmaster.io.entity;
 
-import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import jakarta.persistence.*;
@@ -10,6 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "recipes")
 public class RecipeEntity implements Serializable {
@@ -19,6 +19,7 @@ public class RecipeEntity implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
+    private String recipePid;
     @Column(nullable = false, unique = true)
     private String name;
     @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
@@ -87,7 +88,7 @@ public class RecipeEntity implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
     public boolean similar(RecipeDto other) {
@@ -104,7 +105,7 @@ public class RecipeEntity implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
 
@@ -117,6 +118,14 @@ public class RecipeEntity implements Serializable {
 
     protected void setId(Long id) {
         this.id = id;
+    }
+
+    public String getRecipePid() {
+        return recipePid;
+    }
+
+    public void setRecipePid(String recipePid) {
+        this.recipePid = recipePid;
     }
 
     public String getName() {

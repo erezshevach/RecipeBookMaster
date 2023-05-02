@@ -2,20 +2,30 @@ package com.erezshevach.recipebookmaster.recipebookmaster.exceptions;
 
 public class RecipeException extends RuntimeException{
 
-    private String recipeName;
+    private String identifier;
+    private String objectClass;
 
-    public RecipeException(String recipeName, String message) {
+    public RecipeException(String identifier, String objectClass, String message) {
         super(message);
-        this.recipeName = recipeName;
+        this.identifier = identifier;
+        this.objectClass = objectClass;
     }
 
     //-------------------getters & setters ----------------------------
 
-    public String getRecipeName() {
-        return recipeName;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setRecipeName(String recipeName) {
-        this.recipeName = recipeName;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getObjectClass() {
+        return objectClass;
+    }
+
+    public void setObjectClass(String objectClass) {
+        this.objectClass = objectClass;
     }
 }

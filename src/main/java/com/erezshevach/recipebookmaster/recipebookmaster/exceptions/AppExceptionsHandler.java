@@ -14,7 +14,7 @@ import java.util.Date;
 public class AppExceptionsHandler {
     @ExceptionHandler(value = RecipeException.class)
     public ResponseEntity<Object> handleRecipeException(RecipeException ex, WebRequest request) {
-        RecipeErrorMessage error = new RecipeErrorMessage(new Date(), ex.getRecipeName(), ex.getMessage());
+        RecipeErrorMessage error = new RecipeErrorMessage(new Date(), ex.getIdentifier(), ex. getObjectClass(), ex.getMessage());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

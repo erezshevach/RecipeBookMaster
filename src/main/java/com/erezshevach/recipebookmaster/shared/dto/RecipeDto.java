@@ -10,11 +10,13 @@ import com.erezshevach.recipebookmaster.ui.model.response.RecipeResponseModel;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class RecipeDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 24L;
 
+    private String recipePid;
     private String name;
     private List<RecipeProcessDto> processes;
     private Integer kCalPer100g;
@@ -53,7 +55,7 @@ public class RecipeDto implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
     public boolean similar(RecipeDto other) {
@@ -70,7 +72,7 @@ public class RecipeDto implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
     public boolean similar(RecipeResponseModel other) {
@@ -87,7 +89,7 @@ public class RecipeDto implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
     public boolean similar(RecipeRequestModel other) {
@@ -104,12 +106,20 @@ public class RecipeDto implements Serializable {
             }
 
         }
-        return this.name == other.getName() && processesSimilarity;
+        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
 
     //------------------- getters & setters ----------------------------
 
+
+    public String getRecipePid() {
+        return recipePid;
+    }
+
+    public void setRecipePid(String recipePid) {
+        this.recipePid = recipePid;
+    }
 
     public String getName() {
         return name;

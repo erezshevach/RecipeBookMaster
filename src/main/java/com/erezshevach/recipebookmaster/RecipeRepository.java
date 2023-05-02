@@ -11,8 +11,7 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends CrudRepository<RecipeEntity, Long>, PagingAndSortingRepository<RecipeEntity, Long> {
 
-    RecipeEntity findRecipeByName(String Name);
-    List<RecipeEntity> findRecipesByNameContains(Pageable pageable, String partialName);
-
-
+    RecipeEntity findByNameIgnoreCase(String name);
+    RecipeEntity findByRecipePid(String pid);
+    List<RecipeEntity> findByNameContainsOrderByName(Pageable pageable, String partialName);
 }

@@ -1,16 +1,27 @@
 package com.erezshevach.recipebookmaster.service;
 
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface RecipeService {
 
+    @Transactional
     RecipeDto createRecipe(RecipeDto recipeDtoIn);
 
     RecipeDto getRecipeByName(String name);
 
+    RecipeDto getRecipeByPid(String pid);
+
     List<RecipeDto> getRecipesByPartialName(String partialName, int page, int limit);
 
-    void deleteRecipe(String name);
+    @Transactional
+    RecipeDto updateRecipeByPid(String pid, RecipeDto recipeDtoIn);
+
+    @Transactional
+    void deleteRecipeByName(String name);
+
+    @Transactional
+    void deleteRecipeByPid(String pid);
 }

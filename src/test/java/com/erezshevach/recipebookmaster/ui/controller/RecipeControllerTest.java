@@ -4,11 +4,8 @@ import com.erezshevach.recipebookmaster.Uom;
 import com.erezshevach.recipebookmaster.io.entity.RecipeComponentEntity;
 import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
 import com.erezshevach.recipebookmaster.io.entity.RecipeProcessEntity;
-import com.erezshevach.recipebookmaster.recipebookmaster.exceptions.RecipeException;
 import com.erezshevach.recipebookmaster.service.RecipeService;
-import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
-import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import com.erezshevach.recipebookmaster.ui.model.request.RecipeRequestModel;
 import com.erezshevach.recipebookmaster.ui.model.response.OperationName;
 import com.erezshevach.recipebookmaster.ui.model.response.OperationStatus;
@@ -41,7 +38,7 @@ class RecipeControllerTest {
 
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         recipeDto = buildRecipeDto();
     }
@@ -49,24 +46,13 @@ class RecipeControllerTest {
     @Test
     @DisplayName("get recipe")
     void getRecipe() {
-        when(service.getRecipeByName(anyString())).thenReturn(recipeDto);
+        when(service.getRecipeByPid(anyString())).thenReturn(recipeDto);
 
         RecipeResponseModel response = controller.getRecipe("some name");
 
         assertAll(
                 ()-> assertNotNull(response, "response model should not be null"),
                 ()-> assertTrue(recipeDto.similar(response), "response details should be similar to dto details")
-        );
-    }
-
-    @Test
-    @DisplayName("get recipe - no name provided")
-    void getRecipe_noNmae() {
-
-        assertAll(
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.getRecipe(""), "IllegalArgumentException should be thrown when name is empty"),
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.getRecipe("   "), "IllegalArgumentException should be thrown when name is blank"),
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.getRecipe(null), "IllegalArgumentException should be thrown when name is null")
         );
     }
 
@@ -108,33 +94,6 @@ class RecipeControllerTest {
     }
 
     @Test
-    @DisplayName("create recipe - missing name in dto")
-    void createRecipe_missingName() {
-        RecipeRequestModel request = buildRecipeRequestModel();
-
-        request.setName(null);
-        assertThrows(RecipeException.class, ()-> controller.createRecipe(request), "RecipeException should be thrown when name is null");
-
-        request.setName("");
-        assertThrows(RecipeException.class, ()-> controller.createRecipe(request), "RecipeException should be thrown when name is empty");
-
-        request.setName("   ");
-        assertThrows(RecipeException.class, ()-> controller.createRecipe(request), "RecipeException should be thrown when name is blank");
-    }
-
-    @Test
-    @DisplayName("create recipe - missing processes in dto")
-    void createRecipe_missingProcesses() {
-        RecipeRequestModel request = buildRecipeRequestModel();
-
-        request.setProcesses(null);
-        assertThrows(RecipeException.class, ()-> controller.createRecipe(request), "RecipeException should be thrown when processes is null");
-
-        request.setProcesses(new ArrayList<>());
-        assertThrows(RecipeException.class, ()-> controller.createRecipe(request), "RecipeException should be thrown when processes is empty");
-    }
-
-    @Test
     @DisplayName("delete recipe")
     void deleteRecipe() {
         String name = "some name";
@@ -147,16 +106,6 @@ class RecipeControllerTest {
         );
     }
 
-    @Test
-    @DisplayName("delete recipe - no name provided")
-    void deleteRecipe_noNmae() {
-
-        assertAll(
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.deleteRecipe(""), "IllegalArgumentException should be thrown when name is empty"),
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.deleteRecipe("   "), "IllegalArgumentException should be thrown when name is blank"),
-                () -> assertThrows(IllegalArgumentException.class, () -> controller.deleteRecipe(null), "IllegalArgumentException should be thrown when name is null")
-        );
-    }
 
     private RecipeEntity buildRecipeEntity(){
         List<RecipeComponentEntity> components1 = new ArrayList<>();

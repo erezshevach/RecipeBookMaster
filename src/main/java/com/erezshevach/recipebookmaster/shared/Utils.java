@@ -10,11 +10,16 @@ public class Utils {
     private final Random RANDOM = new SecureRandom();
 
 
-    public String generateProcessId(int length) {
+    public String generateRecipePid(int length, String name) {
+        String nameSample = name.replace(" ", "").substring(0,(Math.min(10, name.length()))).toLowerCase();
+        return nameSample + "_" + generateRandomString(length);
+    }
+
+    public String generateProcessPid(int length) {
         return "P" + generateRandomString(length);
     }
 
-    public String generateComponentId(int length) {
+    public String generateComponentPid(int length) {
         return "C" + generateRandomString(length);
     }
 

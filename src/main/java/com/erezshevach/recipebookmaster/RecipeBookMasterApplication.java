@@ -23,7 +23,4 @@ public class RecipeBookMasterApplication extends SpringBootServletInitializer {
 
 
     }
-
-
-
 }
