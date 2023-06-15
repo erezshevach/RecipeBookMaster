@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("recipes")
+@RequestMapping("api/recipes")
 public class RecipeController {
     RecipeService recipeService;
     RecipeProcessService processService;
@@ -63,14 +63,27 @@ public class RecipeController {
         return mapper.map(recipeDto, RecipeResponseModel.class);
     }
 
+//    @GetMapping(
+//            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+//    )
+//    public List<RecipeResponseModel> getRecipes(@RequestParam(value = "pname", defaultValue = "") String partialName,
+//                                                @RequestParam(value = "page", defaultValue = "1") int page,
+//                                                @RequestParam(value = "limit", defaultValue = "25") int limit) {
+//        partialName = partialName.trim();
+//        List<RecipeDto> recipeDtos = recipeService.getRecipesByPartialName(partialName, page, limit);
+//
+//        ModelMapper mapper = new ModelMapper();
+//        return mapper.map(recipeDtos, new TypeToken<List<RecipeResponseModel>>() {}.getType());
+//    }
+
     @GetMapping(
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
     )
-    public List<RecipeResponseModel> getRecipes(@RequestParam(value = "pname", defaultValue = "") String partialName,
+    public List<RecipeResponseModel> getRecipeHeaders(@RequestParam(value = "pname", defaultValue = "") String partialName,
                                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                                 @RequestParam(value = "limit", defaultValue = "25") int limit) {
         partialName = partialName.trim();
-        List<RecipeDto> recipeDtos = recipeService.getRecipesByPartialName(partialName, page, limit);
+        List<RecipeDto> recipeDtos = recipeService.getRecipeHeadersByPartialName(partialName, page, limit);
 
         ModelMapper mapper = new ModelMapper();
         return mapper.map(recipeDtos, new TypeToken<List<RecipeResponseModel>>() {}.getType());

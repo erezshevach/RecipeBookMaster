@@ -76,8 +76,25 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeDto;
     }
 
+//    @Override
+//    public List<RecipeDto> getRecipesByPartialName(String partialName, int page, int limit) {
+//        if (page < 0 || limit < 1) throw new IllegalArgumentException("page/limit must be positive");
+//        partialName = partialName.trim();
+//        List<RecipeDto> result = new ArrayList<>();
+//        if (page > 0) page -= 1;
+//        Pageable pageable = PageRequest.of(page, limit);
+//        List<RecipeEntity> recipes = recipeRepository.findByNameContainsOrderByName(pageable, partialName);
+//        ModelMapper mapper = new ModelMapper();
+//        for (RecipeEntity recipe : recipes) {
+//            RecipeDto recipeDto = mapper.map(recipe, RecipeDto.class);
+//            setRelatedProcessSequenceForPresentation(recipeDto);
+//            result.add(recipeDto);
+//        }
+//        return result;
+//    }
+
     @Override
-    public List<RecipeDto> getRecipesByPartialName(String partialName, int page, int limit) {
+    public List<RecipeDto> getRecipeHeadersByPartialName(String partialName, int page, int limit) {
         if (page < 0 || limit < 1) throw new IllegalArgumentException("page/limit must be positive");
         partialName = partialName.trim();
         List<RecipeDto> result = new ArrayList<>();
@@ -86,8 +103,8 @@ public class RecipeServiceImpl implements RecipeService {
         List<RecipeEntity> recipes = recipeRepository.findByNameContainsOrderByName(pageable, partialName);
         ModelMapper mapper = new ModelMapper();
         for (RecipeEntity recipe : recipes) {
-            RecipeDto recipeDto = mapper.map(recipe, RecipeDto.class);
-            setRelatedProcessSequenceForPresentation(recipeDto);
+            RecipeDto recipeDto = new RecipeDto();
+            mapOnlyHeaderValues(recipeDto, recipe);
             result.add(recipeDto);
         }
         return result;
@@ -214,5 +231,16 @@ public class RecipeServiceImpl implements RecipeService {
                 component.setRelatedProcessSequence(process.getSequence());
             }
         }
+    }
+
+    private void mapOnlyHeaderValues(RecipeDto dto, RecipeEntity entity) {
+        dto.setRecipePid(entity.getRecipePid());
+        dto.setName(entity.getName());
+        dto.setkCalPer100g(entity.getkCalPer100g());
+        dto.setContainsGluten(entity.isContainsGluten());
+        dto.setContainsDairy(entity.isContainsDairy());
+        dto.setContainsNuts(entity.isContainsNuts());
+        dto.setContainsPeanuts(entity.isContainsPeanuts());
+        dto.setVegan(entity.isVegan());
     }
 }

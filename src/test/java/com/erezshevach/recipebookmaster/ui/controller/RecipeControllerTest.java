@@ -65,9 +65,9 @@ class RecipeControllerTest {
         for (int i = 0; i < limit; i++) {
             recipeDtos.add(buildRecipeDto());
         }
-        when(service.getRecipesByPartialName(anyString(), anyInt(), anyInt())).thenReturn(recipeDtos);
+        when(service.getRecipeHeadersByPartialName(anyString(), anyInt(), anyInt())).thenReturn(recipeDtos);
 
-        List<RecipeResponseModel> response = controller.getRecipes("some name", page, limit);
+        List<RecipeResponseModel> response = controller.getRecipeHeaders("some name", page, limit);
 
         assertAll(
                 ()-> assertNotNull(response, "response model list should not be null"),

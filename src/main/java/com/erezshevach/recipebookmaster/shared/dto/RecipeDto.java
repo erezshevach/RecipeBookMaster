@@ -9,6 +9,7 @@ import com.erezshevach.recipebookmaster.ui.model.response.RecipeResponseModel;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ public class RecipeDto implements Serializable {
 
     private String recipePid;
     private String name;
-    private List<RecipeProcessDto> processes;
+    private List<RecipeProcessDto> processes = new ArrayList<>();
     private Integer kCalPer100g;
     private boolean containsGluten;
     private boolean containsDairy;

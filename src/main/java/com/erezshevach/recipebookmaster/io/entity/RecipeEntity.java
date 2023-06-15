@@ -22,7 +22,7 @@ public class RecipeEntity implements Serializable {
     private String recipePid;
     @Column(nullable = false, unique = true)
     private String name;
-    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RecipeProcessEntity> processes = new ArrayList<>();
     //@ManyToMany
     //private List<RecipeTag> tags;

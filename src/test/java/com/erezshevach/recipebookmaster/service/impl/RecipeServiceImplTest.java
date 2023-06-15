@@ -11,6 +11,7 @@ import com.erezshevach.recipebookmaster.shared.Utils;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.ui.model.response.ErrorMessages;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -271,8 +272,8 @@ class RecipeServiceImplTest {
     }
 
     @Test
-    @DisplayName("get recipe by partial name")
-    void getRecipesByPartialName() {
+    @DisplayName("get recipe headers list by partial name")
+    void getRecipeHeadersByPartialName() {
 
         List<RecipeEntity> recipes = new ArrayList<>();
         for (int i = 1; i <= limit; i++) {
@@ -281,7 +282,7 @@ class RecipeServiceImplTest {
         Pageable pageable = PageRequest.of(page - 1, limit);
         when(recipeRepository.findByNameContainsOrderByName(eq(pageable), anyString())).thenReturn(recipes);
 
-        List<RecipeDto> recipeDtos = service.getRecipesByPartialName("partial name", page, limit);
+        List<RecipeDto> recipeDtos = service.getRecipeHeadersByPartialName("partial name", page, limit);
 
         assertNotNull(recipeDtos, "DTO's result list should not be null");
         assertEquals(recipes.size(), recipeDtos.size(), "result list size should be full");
@@ -291,8 +292,8 @@ class RecipeServiceImplTest {
     }
 
     @Test
-    @DisplayName("get recipe lists by partial name - empty or blank name")
-    void getRecipesByPartialName_noName() {
+    @DisplayName("get recipe headers list by partial name - empty or blank name")
+    void getRecipeHeadersByPartialName_noName() {
         List<RecipeEntity> recipes = new ArrayList<>();
         for (int i = 1; i <= limit; i++) {
             recipes.add(new RecipeEntity(name + i));
@@ -300,45 +301,46 @@ class RecipeServiceImplTest {
         Pageable pageable = PageRequest.of(page - 1, limit);
         when(recipeRepository.findByNameContainsOrderByName(pageable, "")).thenReturn(recipes);
 
-        List<RecipeDto> recipeDtos = service.getRecipesByPartialName("", page, limit);
+        List<RecipeDto> recipeDtos = service.getRecipeHeadersByPartialName("", page, limit);
         assertEquals(recipes.size(), recipeDtos.size(), "result list size should be full for empty name");
 
-        recipeDtos = service.getRecipesByPartialName("    ", page, limit);
+        recipeDtos = service.getRecipeHeadersByPartialName("    ", page, limit);
         assertEquals(recipes.size(), recipeDtos.size(), "result list size should be full for blank name");
 
     }
 
     @Test
-    @DisplayName("get recipe lists by partial name - illegal arguments")
-    void getRecipesByPartialName_illegalArgs() {
+    @DisplayName("get recipe headers list by partial name - illegal arguments")
+    void getRecipeHeadersByPartialName_illegalArgs() {
         assertAll(
-                () -> assertThrows(IllegalArgumentException.class, () -> service.getRecipesByPartialName(name, -1, limit), "negative page should throw IllegalArgumentException"),
-                () -> assertThrows(IllegalArgumentException.class, () -> service.getRecipesByPartialName(name, page, 0), "non-positive page should throw IllegalArgumentException")
+                () -> assertThrows(IllegalArgumentException.class, () -> service.getRecipeHeadersByPartialName(name, -1, limit), "negative page should throw IllegalArgumentException"),
+                () -> assertThrows(IllegalArgumentException.class, () -> service.getRecipeHeadersByPartialName(name, page, 0), "non-positive page should throw IllegalArgumentException")
         );
     }
 
     @Test
-    @DisplayName("get recipe lists by partial name - no matches found")
-    void getRecipesByPartialName_noMatchesFound() {
+    @DisplayName("get recipe headers list by partial name - no matches found")
+    void getRecipeHeadersByPartialName_noMatchesFound() {
         List<RecipeEntity> recipes = new ArrayList<>();
         Pageable pageable = PageRequest.of(page - 1, limit);
         when(recipeRepository.findByNameContainsOrderByName(pageable, "non-existing partial name")).thenReturn(recipes);
 
-        List<RecipeDto> recipeDtos = service.getRecipesByPartialName("non-existing partial name", page, limit);
+        List<RecipeDto> recipeDtos = service.getRecipeHeadersByPartialName("non-existing partial name", page, limit);
 
         assertTrue(recipeDtos.isEmpty(), "result list should be empty for non-existing name");
     }
 
+    @Disabled
     @Test
-    @DisplayName("get recipes list by partial name - setting component's related process sequence")
-    void getRecipeByPartialName_relatedProcessSequence() {
+    @DisplayName("get recipe headers list by partial name - setting component's related process sequence")
+    void getRecipeHeadersByPartialName_relatedProcessSequence() {
         recipe = buildRecipeEntity();
         List<RecipeEntity> recipes = new ArrayList<>();
         recipes.add(recipe);
         Pageable pageable = PageRequest.of(page - 1, limit);
         when(recipeRepository.findByNameContainsOrderByName(eq(pageable), anyString())).thenReturn(recipes);
 
-        List<RecipeDto> recipeDtos = service.getRecipesByPartialName("partial name", page, limit);
+        List<RecipeDto> recipeDtos = service.getRecipeHeadersByPartialName("partial name", page, limit);
 
         int firstProcessSeq = recipe.getProcesses().get(0).getSequence();
         int secondProcessSeq = recipe.getProcesses().get(1).getSequence();

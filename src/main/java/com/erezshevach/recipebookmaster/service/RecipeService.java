@@ -14,7 +14,7 @@ public interface RecipeService {
 
     RecipeDto getRecipeByPid(String pid);
 
-    List<RecipeDto> getRecipesByPartialName(String partialName, int page, int limit);
+    List<RecipeDto> getRecipeHeadersByPartialName(String partialName, int page, int limit);
 
     @Transactional
     RecipeDto updateRecipeByPid(String pid, RecipeDto recipeDtoIn);
