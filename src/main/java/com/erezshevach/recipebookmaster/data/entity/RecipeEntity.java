@@ -1,11 +1,9 @@
-package com.erezshevach.recipebookmaster.shared.dto;
+package com.erezshevach.recipebookmaster.data.entity;
 
-import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
-import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
-import com.erezshevach.recipebookmaster.presentation.model.request.RecipeProcessRequestModel;
-import com.erezshevach.recipebookmaster.presentation.model.request.RecipeRequestModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeProcessResponseModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeResponseModel;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
+import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,28 +11,62 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RecipeDto implements Serializable {
+@Entity(name = "recipes")
+public class RecipeEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 24L;
 
+    @Id
+    @GeneratedValue
+    private Long id;
     private String recipePid;
+    @Column(nullable = false, unique = true)
     private String name;
-    private List<RecipeProcessDto> processes = new ArrayList<>();
-    private Integer kCalPer100g;
-    private boolean containsGluten;
-    private boolean containsDairy;
-    private boolean containsNuts;
-    private boolean containsPeanuts;
-    private boolean vegan;
+    @OneToMany(mappedBy = "ofRecipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RecipeProcessEntity> processes = new ArrayList<>();
+    //@ManyToMany
+    //private List<RecipeTag> tags;
+    private Integer kCalPer100g = 0;
+    private boolean containsGluten = false;
+    private boolean containsDairy = false;
+    private boolean containsNuts = false;
+    private boolean containsPeanuts = false;
+    private boolean vegan = false;
 
 
-    //------------------- methods ----------------------------
+    // ---------- constructors ----------
+
+
+    protected RecipeEntity() {
+    }
+
+    public RecipeEntity(@NotNull String name) {
+        if (name == null || name.isEmpty() || name.isBlank()) throw new IllegalArgumentException("Recipe name is required");
+
+        this.name = name;
+    }
+
+    public RecipeEntity(@NotNull String name, List<RecipeProcessEntity> processes) {
+        this(name);
+
+        if (processes != null) {
+            for (RecipeProcessEntity p : processes) {
+                p.setOfRecipe(this);
+            }
+            this.processes = processes;
+        }
+    }
+
+
+    // ---------- methods ----------
 
 
     public String toString() {
         StringBuilder s = new StringBuilder()
+                .append(id)
+                .append(" ")
                 .append(name);
-        for (RecipeProcessDto p : processes) {
+        for (RecipeProcessEntity p : processes) {
             if (p != null) {
                 s.append("\n").append(p.toStringDetailed());
             }
@@ -76,54 +108,32 @@ public class RecipeDto implements Serializable {
         return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
-    public boolean similar(RecipeResponseModel other) {
-        List<RecipeProcessResponseModel> otherProcesses = other.getProcesses();
-        int processesSize = processes != null ? processes.size() : -1;
-        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
-        boolean processesSimilarity = processesSize == otherProcessesSize;
-        if (processesSimilarity && processesSize > 0) {
-            for (int i = 0; i < processesSize; i++) {
-                if (!processes.get(i).similar(otherProcesses.get(i))){
-                    processesSimilarity = false;
-                    break;
-                }
-            }
-
+    /**
+     * copyHeaderValuesFromTarget - copies only header attributes values (not processes and components), excluding IDs
+     * @param target recipe entity to copy from
+     */
+    public void copyHeaderValuesFromTarget(RecipeEntity target) {
+        if (target != null) {
+            this.setName(target.getName());
+            this.setContainsDairy(target.isContainsDairy());
+            this.setContainsGluten(target.isContainsGluten());
+            this.setContainsNuts(target.isContainsNuts());
+            this.setContainsPeanuts(target.isContainsPeanuts());
+            this.setVegan(target.isVegan());
+            this.setkCalPer100g(target.getkCalPer100g());
         }
-        return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
-    public boolean similar(RecipeRequestModel other) {
-        List<RecipeProcessRequestModel> otherProcesses = other.getProcesses();
-        int processesSize = processes != null ? processes.size() : -1;
-        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
-        boolean processesSimilarity = processesSize == otherProcessesSize;
-        if (processesSimilarity && processesSize > 0) {
-            for (int i = 0; i < processesSize; i++) {
-                if (!processes.get(i).similar(otherProcesses.get(i))){
-                    processesSimilarity = false;
-                    break;
-                }
-            }
+    //-------------------getters & setters ----------------------------
 
-        }
-        return Objects.equals(this.name, other.getName()) && processesSimilarity;
+
+    public Long getId() {
+        return id;
     }
 
-    public static void mapOnlyHeaderValues(RecipeDto dto, RecipeEntity entity) {
-        dto.setRecipePid(entity.getRecipePid());
-        dto.setName(entity.getName());
-        dto.setkCalPer100g(entity.getkCalPer100g());
-        dto.setContainsGluten(entity.isContainsGluten());
-        dto.setContainsDairy(entity.isContainsDairy());
-        dto.setContainsNuts(entity.isContainsNuts());
-        dto.setContainsPeanuts(entity.isContainsPeanuts());
-        dto.setVegan(entity.isVegan());
+    protected void setId(Long id) {
+        this.id = id;
     }
-
-
-    //------------------- getters & setters ----------------------------
-
 
     public String getRecipePid() {
         return recipePid;
@@ -141,11 +151,16 @@ public class RecipeDto implements Serializable {
         this.name = name;
     }
 
-    public List<RecipeProcessDto> getProcesses() {
+    public List<RecipeProcessEntity> getProcesses() {
         return processes;
     }
 
-    public void setProcesses(List<RecipeProcessDto> processes) {
+    public void setProcesses(List<RecipeProcessEntity> processes) {
+        if (processes != null) {
+            for (RecipeProcessEntity p : processes) {
+                p.setOfRecipe(this);
+            }
+        }
         this.processes = processes;
     }
 

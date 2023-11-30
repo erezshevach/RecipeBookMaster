@@ -1,8 +1,8 @@
 package com.erezshevach.recipebookmaster.service.impl;
 
-import com.erezshevach.recipebookmaster.RecipeProcessRepository;
-import com.erezshevach.recipebookmaster.recipebookmaster.exceptions.RecipeException;
-import com.erezshevach.recipebookmaster.ui.model.response.ErrorMessages;
+import com.erezshevach.recipebookmaster.data.reposirory.RecipeProcessRepository;
+import com.erezshevach.recipebookmaster.exceptions.RecipeException;
+import com.erezshevach.recipebookmaster.exceptions.ErrorMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

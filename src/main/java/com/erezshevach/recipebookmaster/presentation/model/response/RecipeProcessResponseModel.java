@@ -1,26 +1,17 @@
-package com.erezshevach.recipebookmaster.shared.dto;
+package com.erezshevach.recipebookmaster.presentation.model.response;
 
-import com.erezshevach.recipebookmaster.data.entity.RecipeComponentEntity;
-import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeComponentRequestModel;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeProcessRequestModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeComponentResponseModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeProcessResponseModel;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
-public class RecipeProcessDto implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 24L;
-
-    private Long id;
+public class RecipeProcessResponseModel {
     private String processPid;
     private int sequence;
     private String description;
-    private List<RecipeComponentDto> components;
-    private RecipeDto ofRecipe;
+    private List<RecipeComponentResponseModel> components;
 
 
     //------------------- methods ----------------------------
@@ -35,31 +26,12 @@ public class RecipeProcessDto implements Serializable {
                 .append(sequence)
                 .append(". ")
                 .append(description);
-        for (RecipeComponentDto c : components) {
+        for (RecipeComponentResponseModel c : components) {
             if (c != null) {
                 s.append("\n").append(c);
             }
         }
         return s.toString();
-    }
-
-    public boolean similar(RecipeProcessEntity other) {
-        List<RecipeComponentEntity> otherComponents = other.getComponents();
-        int componentsSize = components != null ? components.size() : -1;
-        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
-        boolean componentsSimilarity = componentsSize == otherComponentsSize;
-        if (componentsSimilarity && componentsSize > 0) {
-            for (int i = 0; i < componentsSize; i++) {
-                if (!components.get(i).similar(otherComponents.get(i))){
-                    componentsSimilarity = false;
-                    break;
-                }
-            }
-
-        }
-        return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
-                componentsSimilarity;
     }
 
     public boolean similar(RecipeProcessDto other) {
@@ -77,26 +49,7 @@ public class RecipeProcessDto implements Serializable {
 
         }
         return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
-                componentsSimilarity;
-    }
-
-    public boolean similar(RecipeProcessRequestModel other) {
-        List<RecipeComponentRequestModel> otherComponents = other.getComponents();
-        int componentsSize = components != null ? components.size() : -1;
-        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
-        boolean componentsSimilarity = componentsSize == otherComponentsSize;
-        if (componentsSimilarity && componentsSize > 0) {
-            for (int i = 0; i < componentsSize; i++) {
-                if (!components.get(i).similar(otherComponents.get(i))){
-                    componentsSimilarity = false;
-                    break;
-                }
-            }
-
-        }
-        return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
+                this.description.equals(other.getDescription())  &&
                 componentsSimilarity;
     }
 
@@ -115,21 +68,32 @@ public class RecipeProcessDto implements Serializable {
 
         }
         return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
+                this.description.equals(other.getDescription())  &&
+                componentsSimilarity;
+    }
+
+    public boolean similar(RecipeProcessRequestModel other) {
+        List<RecipeComponentRequestModel> otherComponents = other.getComponents();
+        int componentsSize = components != null ? components.size() : -1;
+        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
+        boolean componentsSimilarity = componentsSize == otherComponentsSize;
+        if (componentsSimilarity && componentsSize > 0) {
+            for (int i = 0; i < componentsSize; i++) {
+                if (!components.get(i).similar(otherComponents.get(i))){
+                    componentsSimilarity = false;
+                    break;
+                }
+            }
+
+        }
+        return this.sequence == other.getSequence() &&
+                this.description.equals(other.getDescription())  &&
                 componentsSimilarity;
     }
 
 
     //------------------- getters & setters ----------------------------
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getProcessPid() {
         return processPid;
@@ -155,19 +119,11 @@ public class RecipeProcessDto implements Serializable {
         this.description = description;
     }
 
-    public List<RecipeComponentDto> getComponents() {
+    public List<RecipeComponentResponseModel> getComponents() {
         return components;
     }
 
-    public void setComponents(List<RecipeComponentDto> components) {
+    public void setComponents(List<RecipeComponentResponseModel> components) {
         this.components = components;
-    }
-
-    public RecipeDto getOfRecipe() {
-        return ofRecipe;
-    }
-
-    public void setOfRecipe(RecipeDto ofRecipe) {
-        this.ofRecipe = ofRecipe;
     }
 }

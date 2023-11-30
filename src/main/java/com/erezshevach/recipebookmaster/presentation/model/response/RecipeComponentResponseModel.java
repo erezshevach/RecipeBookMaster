@@ -1,78 +1,48 @@
-package com.erezshevach.recipebookmaster.shared.dto;
+package com.erezshevach.recipebookmaster.presentation.model.response;
 
 import com.erezshevach.recipebookmaster.shared.Uom;
-import com.erezshevach.recipebookmaster.data.entity.RecipeComponentEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeComponentRequestModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeComponentResponseModel;
 
-import java.io.Serial;
-import java.io.Serializable;
+public class RecipeComponentResponseModel {
 
-public class RecipeComponentDto implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 24L;
-
-    private long id;
     private String componentPid;
     private double quantity;
     private Uom uom;
     private String ingredient;
     private String state;
-    private RecipeDto ofRecipe;
-    private RecipeProcessDto ofProcess;
     private Integer relatedProcessSequence;
 
 
     //------------------- methods ----------------------------
 
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        s.append(quantity).append(" ").append(uom).append(" ").append(ingredient);
-        if (state != null) {
-            s.append(" ").append(state);
-        }
-        return s.toString();
-    }
 
-    public boolean similar(RecipeComponentEntity other) {
-        return this.quantity == other.getQuantity() &&
-                this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
-                this.state.equals(other.getState());
-    }
 
     public boolean similar(RecipeComponentDto other) {
         return this.quantity == other.getQuantity() &&
                 this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
+                this.ingredient.equals(other.getIngredient())  &&
                 this.state.equals(other.getState());
     }
 
     public boolean similar(RecipeComponentResponseModel other) {
         return this.quantity == other.getQuantity() &&
                 this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
+                this.ingredient.equals(other.getIngredient())  &&
                 this.state.equals(other.getState());
     }
 
     public boolean similar(RecipeComponentRequestModel other) {
         return this.quantity == other.getQuantity() &&
                 this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
+                this.ingredient.equals(other.getIngredient())  &&
                 this.state.equals(other.getState());
     }
 
 
+
     //------------------- getters & setters ----------------------------
 
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getComponentPid() {
         return componentPid;
@@ -112,22 +82,6 @@ public class RecipeComponentDto implements Serializable {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    public RecipeDto getOfRecipe() {
-        return ofRecipe;
-    }
-
-    public void setOfRecipe(RecipeDto ofRecipe) {
-        this.ofRecipe = ofRecipe;
-    }
-
-    public RecipeProcessDto getOfProcess() {
-        return ofProcess;
-    }
-
-    public void setOfProcess(RecipeProcessDto ofProcess) {
-        this.ofProcess = ofProcess;
     }
 
     public Integer getRelatedProcessSequence() {

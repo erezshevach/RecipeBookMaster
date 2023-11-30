@@ -20,7 +20,5 @@ public class RecipeBookMasterApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
 
         SpringApplication.run(RecipeBookMasterApplication.class, args);
-
-
     }
 }

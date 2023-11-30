@@ -20,8 +20,8 @@ public interface RecipeService {
     RecipeDto updateRecipeByPid(String pid, RecipeDto recipeDtoIn);
 
     @Transactional
-    void deleteRecipeByName(String name);
+    RecipeDto deleteRecipeByName(String name);
 
     @Transactional
-    void deleteRecipeByPid(String pid);
+    RecipeDto deleteRecipeByPid(String pid);
 }

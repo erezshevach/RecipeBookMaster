@@ -1,7 +1,7 @@
 package com.erezshevach.recipebookmaster.service;
 
 
-import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
+import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
 
 public interface RecipeProcessService {
 

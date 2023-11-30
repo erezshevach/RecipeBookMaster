@@ -1,11 +1,11 @@
 package com.erezshevach.recipebookmaster.service.impl;
 
-import com.erezshevach.recipebookmaster.RecipeProcessRepository;
-import com.erezshevach.recipebookmaster.io.entity.RecipeEntity;
-import com.erezshevach.recipebookmaster.io.entity.RecipeProcessEntity;
-import com.erezshevach.recipebookmaster.recipebookmaster.exceptions.RecipeException;
+import com.erezshevach.recipebookmaster.data.reposirory.RecipeProcessRepository;
+import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
+import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.exceptions.RecipeException;
 import com.erezshevach.recipebookmaster.service.RecipeProcessService;
-import com.erezshevach.recipebookmaster.ui.model.response.ErrorMessages;
+import com.erezshevach.recipebookmaster.exceptions.ErrorMessages;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

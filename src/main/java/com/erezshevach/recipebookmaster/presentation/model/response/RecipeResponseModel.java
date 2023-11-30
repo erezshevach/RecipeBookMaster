@@ -1,25 +1,18 @@
-package com.erezshevach.recipebookmaster.shared.dto;
+package com.erezshevach.recipebookmaster.presentation.model.response;
 
-import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
-import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
+import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeProcessRequestModel;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeRequestModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeProcessResponseModel;
-import com.erezshevach.recipebookmaster.presentation.model.response.RecipeResponseModel;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RecipeDto implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 24L;
+public class RecipeResponseModel {
 
     private String recipePid;
     private String name;
-    private List<RecipeProcessDto> processes = new ArrayList<>();
+    private List<RecipeProcessResponseModel> processes;
     private Integer kCalPer100g;
     private boolean containsGluten;
     private boolean containsDairy;
@@ -30,34 +23,6 @@ public class RecipeDto implements Serializable {
 
     //------------------- methods ----------------------------
 
-
-    public String toString() {
-        StringBuilder s = new StringBuilder()
-                .append(name);
-        for (RecipeProcessDto p : processes) {
-            if (p != null) {
-                s.append("\n").append(p.toStringDetailed());
-            }
-        }
-        return s.toString();
-    }
-
-    public boolean similar(RecipeEntity other) {
-        List<RecipeProcessEntity> otherProcesses = other.getProcesses();
-        int processesSize = processes != null ? processes.size() : -1;
-        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
-        boolean processesSimilarity = processesSize == otherProcessesSize;
-        if (processesSimilarity && processesSize > 0) {
-            for (int i = 0; i < processesSize; i++) {
-                if (!processes.get(i).similar(otherProcesses.get(i))){
-                    processesSimilarity = false;
-                    break;
-                }
-            }
-
-        }
-        return Objects.equals(this.name, other.getName()) && processesSimilarity;
-    }
 
     public boolean similar(RecipeDto other) {
         List<RecipeProcessDto> otherProcesses = other.getProcesses();
@@ -110,17 +75,6 @@ public class RecipeDto implements Serializable {
         return Objects.equals(this.name, other.getName()) && processesSimilarity;
     }
 
-    public static void mapOnlyHeaderValues(RecipeDto dto, RecipeEntity entity) {
-        dto.setRecipePid(entity.getRecipePid());
-        dto.setName(entity.getName());
-        dto.setkCalPer100g(entity.getkCalPer100g());
-        dto.setContainsGluten(entity.isContainsGluten());
-        dto.setContainsDairy(entity.isContainsDairy());
-        dto.setContainsNuts(entity.isContainsNuts());
-        dto.setContainsPeanuts(entity.isContainsPeanuts());
-        dto.setVegan(entity.isVegan());
-    }
-
 
     //------------------- getters & setters ----------------------------
 
@@ -141,11 +95,11 @@ public class RecipeDto implements Serializable {
         this.name = name;
     }
 
-    public List<RecipeProcessDto> getProcesses() {
+    public List<RecipeProcessResponseModel> getProcesses() {
         return processes;
     }
 
-    public void setProcesses(List<RecipeProcessDto> processes) {
+    public void setProcesses(List<RecipeProcessResponseModel> processes) {
         this.processes = processes;
     }
 
