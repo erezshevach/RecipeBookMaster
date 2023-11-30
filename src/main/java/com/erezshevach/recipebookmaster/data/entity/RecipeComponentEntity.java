@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity(name = "recipe_components")
 public class RecipeComponentEntity implements Serializable {
@@ -68,18 +69,12 @@ public class RecipeComponentEntity implements Serializable {
         return s.toString();
     }
 
-    public boolean similar(RecipeComponentEntity other) {
-        return this.quantity == other.getQuantity() &&
-                this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
-                this.state.equals(other.getState());
-    }
-
-    public boolean similar(RecipeComponentDto other) {
-        return this.quantity == other.getQuantity() &&
-                this.uom == other.getUom() &&
-                this.ingredient.equals(other.getIngredient()) &&
-                this.state.equals(other.getState());
+    public static boolean compareComponents(RecipeComponentEntity first, RecipeComponentEntity second) {
+        boolean matchingQuantities = first.getQuantity() == second.getQuantity();
+        boolean matchingUom = first.getUom() == second.getUom();
+        boolean matchingIngredients = Objects.equals(first.getIngredient(), second.getIngredient());
+        boolean matchingStates = Objects.equals(first.getState(), second.getState());
+        return matchingQuantities && matchingUom && matchingIngredients && matchingStates;
     }
 
 

@@ -5,6 +5,7 @@ import com.erezshevach.recipebookmaster.data.entity.RecipeComponentEntity;
 import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
 import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
 import com.erezshevach.recipebookmaster.service.RecipeService;
+import com.erezshevach.recipebookmaster.shared.Utils;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.presentation.model.request.RecipeRequestModel;
 import com.erezshevach.recipebookmaster.presentation.model.response.RecipeResponseModel;
@@ -49,7 +50,7 @@ class RecipeControllerTest {
 
         assertAll(
                 () -> assertNotNull(response, "response model should not be null"),
-                () -> assertTrue(recipeDto.similar(response), "response details should be similar to dto details")
+                () -> assertTrue(Utils.compareRecipes(recipeDto, response), "response details should be similar to dto details")
         );
     }
 
@@ -69,9 +70,9 @@ class RecipeControllerTest {
         assertAll(
                 () -> assertNotNull(response, "response model list should not be null"),
                 () -> assertEquals(recipeDtos.size(), response.size(), "response model list size should be as expected"),
-                () -> assertTrue(recipeDtos.get(0).similar(response.get(0)), "response details should be similar to dto details (0)"),
-                () -> assertTrue(recipeDtos.get(1).similar(response.get(1)), "response details should be similar to dto details (1)"),
-                () -> assertTrue(recipeDtos.get(2).similar(response.get(2)), "response details should be similar to dto details (2)")
+                () -> assertTrue(Utils.compareRecipes(recipeDtos.get(0), response.get(0)), "response details should be similar to dto details (0)"),
+                () -> assertTrue(Utils.compareRecipes(recipeDtos.get(1), response.get(1)), "response details should be similar to dto details (1)"),
+                () -> assertTrue(Utils.compareRecipes(recipeDtos.get(2), response.get(2)), "response details should be similar to dto details (2)")
         );
     }
 
@@ -88,7 +89,7 @@ class RecipeControllerTest {
                 () -> assertNotNull(response, "response model should not be null"),
                 () -> verify(service, times(1)).createRecipe(any(RecipeDto.class)),
                 () -> verify(service).createRecipe(dtoCapture.capture()),
-                () -> assertTrue(recipeDto.similar(dtoCapture.getValue()), "dto argument should be passed correctly to the service")
+                () -> assertTrue(Utils.compareRecipes(recipeDto, dtoCapture.getValue()), "dto argument should be passed correctly to the service")
         );
     }
 

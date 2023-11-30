@@ -1,10 +1,7 @@
 package com.erezshevach.recipebookmaster.data.entity;
 
-import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
-import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -74,38 +71,23 @@ public class RecipeEntity implements Serializable {
         return s.toString();
     }
 
-    public boolean similar(RecipeEntity other) {
-        List<RecipeProcessEntity> otherProcesses = other.getProcesses();
-        int processesSize = processes != null ? processes.size() : -1;
-        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
-        boolean processesSimilarity = processesSize == otherProcessesSize;
-        if (processesSimilarity && processesSize > 0) {
-            for (int i = 0; i < processesSize; i++) {
-                if (!processes.get(i).similar(otherProcesses.get(i))){
-                    processesSimilarity = false;
+    public static boolean compareRecipes(RecipeEntity first, RecipeEntity second) {
+        List<RecipeProcessEntity> processes_first = first.getProcesses();
+        List<RecipeProcessEntity> processes_second = second.getProcesses();
+        int nProcesses_first = processes_first != null ? processes_first.size() : -1;
+        int nProcesses_second = processes_second != null ? processes_second.size() : -1;
+        boolean matchingProcesses = nProcesses_first == nProcesses_second;
+        if (matchingProcesses && nProcesses_first > 0) {
+            for (int i = 0; i < nProcesses_first; i++) {
+                if (!RecipeProcessEntity.compareProcesses(processes_first.get(i), processes_second.get(i))){
+                    matchingProcesses = false;
                     break;
                 }
             }
 
         }
-        return Objects.equals(this.name, other.getName()) && processesSimilarity;
-    }
-
-    public boolean similar(RecipeDto other) {
-        List<RecipeProcessDto> otherProcesses = other.getProcesses();
-        int processesSize = processes != null ? processes.size() : -1;
-        int otherProcessesSize = otherProcesses != null ? otherProcesses.size() : -1;
-        boolean processesSimilarity = processesSize == otherProcessesSize;
-        if (processesSimilarity && processesSize > 0) {
-            for (int i = 0; i < processesSize; i++) {
-                if (!processes.get(i).similar(otherProcesses.get(i))){
-                    processesSimilarity = false;
-                    break;
-                }
-            }
-
-        }
-        return Objects.equals(this.name, other.getName()) && processesSimilarity;
+        boolean matchingName = Objects.equals(first.getName(), second.getName());
+        return matchingName && matchingProcesses;
     }
 
     /**

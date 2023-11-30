@@ -37,8 +37,8 @@ class RecipeEntityTest {
                 () -> assertEquals(name, recipe.getName(), "name should be equal to input"),
                 () -> assertEquals(processes, recipe.getProcesses(), "processes list should be equal to input"),
                 ()-> assertEquals(processes.size(), recipe.getProcesses().size(), "processes list size should be equal to input"),
-                ()-> assertTrue(processes.get(0).similar(recipe.getProcesses().get(0)), "process should be equal to input (0)"),
-                ()-> assertTrue(processes.get(1).similar(recipe.getProcesses().get(1)), "process should be equal to input (1)"),
+                ()-> assertTrue(RecipeProcessEntity.compareProcesses(processes.get(0), recipe.getProcesses().get(0)), "process should be equal to input (0)"),
+                ()-> assertTrue(RecipeProcessEntity.compareProcesses(processes.get(1), recipe.getProcesses().get(1)), "process should be equal to input (1)"),
                 () -> assertEquals(recipe, recipe.getProcesses().get(0).getOfRecipe(), "recipe should be set to all sub-processes ofRecipe (0)"),
                 () -> assertEquals(recipe, recipe.getProcesses().get(1).getOfRecipe(), "recipe should be set to all sub-processes ofRecipe (1)")
         );

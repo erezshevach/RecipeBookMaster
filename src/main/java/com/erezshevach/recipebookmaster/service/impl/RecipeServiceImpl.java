@@ -25,17 +25,15 @@ import java.util.List;
 public class RecipeServiceImpl implements RecipeService {
     RecipeRepository recipeRepository;
     RecipeProcessRepository processRepository;
-    Utils utils;
     RecipeProcessService processService;
     ModelMapper mapper;
     private int pidLength = 10;
 
 
     @Autowired
-    public RecipeServiceImpl(RecipeRepository recipeRepository, Utils utils, RecipeProcessService processService, RecipeProcessRepository processRepository) {
+    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeProcessService processService, RecipeProcessRepository processRepository) {
         this.recipeRepository = recipeRepository;
         this.processRepository = processRepository;
-        this.utils = utils;
         this.processService = processService;
         this.mapper = new ModelMapper();
     }
@@ -278,13 +276,13 @@ public class RecipeServiceImpl implements RecipeService {
      * @param recipe as DTO
      */
     private void setGeneratedPublicIds(RecipeDto recipe) {
-        recipe.setRecipePid(utils.generateRecipePid(pidLength, recipe.getName()));
+        recipe.setRecipePid(Utils.generateRecipePid(pidLength, recipe.getName()));
         if (recipe.getProcesses() != null) {
             for (RecipeProcessDto process : recipe.getProcesses()) {
-                process.setProcessPid(utils.generateProcessPid(pidLength));
+                process.setProcessPid(Utils.generateProcessPid(pidLength));
                 if (process.getComponents() != null) {
                     for (RecipeComponentDto component : process.getComponents()) {
-                        component.setComponentPid(utils.generateComponentPid(pidLength));
+                        component.setComponentPid(Utils.generateComponentPid(pidLength));
                     }
                 }
             }
@@ -310,11 +308,11 @@ public class RecipeServiceImpl implements RecipeService {
     private void setStructuralAttributes_input(RecipeDto recipe) {
         for (RecipeProcessDto process : recipe.getProcesses()) {
             process.setOfRecipe(recipe);
-            process.setProcessPid(utils.generateProcessPid(10));
+            process.setProcessPid(Utils.generateProcessPid(10));
             for (RecipeComponentDto component : process.getComponents()) {
                 component.setOfRecipe(recipe);
                 component.setOfProcess(process);
-                component.setComponentPid(utils.generateComponentPid(10));
+                component.setComponentPid(Utils.generateComponentPid(10));
             }
         }
     }

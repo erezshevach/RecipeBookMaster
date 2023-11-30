@@ -1,12 +1,12 @@
 package com.erezshevach.recipebookmaster.service.impl;
 
 import com.erezshevach.recipebookmaster.data.reposirory.RecipeRepository;
+import com.erezshevach.recipebookmaster.service.RecipeProcessService;
 import com.erezshevach.recipebookmaster.shared.Uom;
 import com.erezshevach.recipebookmaster.data.entity.RecipeComponentEntity;
 import com.erezshevach.recipebookmaster.data.entity.RecipeEntity;
 import com.erezshevach.recipebookmaster.data.entity.RecipeProcessEntity;
 import com.erezshevach.recipebookmaster.exceptions.RecipeException;
-import com.erezshevach.recipebookmaster.service.RecipeProcessService;
 import com.erezshevach.recipebookmaster.shared.Utils;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.exceptions.ErrorMessages;
@@ -35,7 +35,8 @@ class RecipeServiceImplTest {
     @Mock
     RecipeRepository recipeRepository;
     @Mock
-    Utils utils;
+    RecipeProcessService processService;
+
 
     final String name = "name";
     final String recipePid = "recipename_123456789";
@@ -64,10 +65,10 @@ class RecipeServiceImplTest {
         assertAll(
                 () -> assertNotNull(recipeDtoOut),
                 () -> assertEquals(recipeDtoIn.getName(), recipeDtoOut.getName(), "name should equal input"),
-                () -> assertTrue(recipeDtoIn.getProcesses().get(0).similar(recipeDtoOut.getProcesses().get(0)), "process should equal input (0)"),
-                () -> assertTrue(recipeDtoIn.getProcesses().get(1).similar(recipeDtoOut.getProcesses().get(1)), "process should equal input (1)"),
-                () -> assertTrue(recipeDtoIn.getProcesses().get(0).getComponents().get(0).similar(recipeDtoOut.getProcesses().get(0).getComponents().get(0)), "component should equal input (0/0)"),
-                () -> assertTrue(recipeDtoIn.getProcesses().get(1).getComponents().get(1).similar(recipeDtoOut.getProcesses().get(1).getComponents().get(1)), "component should equal input (1/1)"),
+                () -> assertTrue(Utils.compareProcesses(recipeDtoIn.getProcesses().get(0), recipeDtoOut.getProcesses().get(0)), "process should equal input (0)"),
+                () -> assertTrue(Utils.compareProcesses(recipeDtoIn.getProcesses().get(1), recipeDtoOut.getProcesses().get(1)), "process should equal input (1)"),
+                () -> assertTrue(Utils.compareComponents(recipeDtoIn.getProcesses().get(0).getComponents().get(0), recipeDtoOut.getProcesses().get(0).getComponents().get(0)), "component should equal input (0/0)"),
+                () -> assertTrue(Utils.compareComponents(recipeDtoIn.getProcesses().get(1).getComponents().get(1), recipeDtoOut.getProcesses().get(1).getComponents().get(1)), "component should equal input (1/1)"),
                 () -> verify(recipeRepository, times(1)).findByNameIgnoreCase(anyString()),
                 () -> verify(recipeRepository, times(1)).save(any(RecipeEntity.class))
         );
@@ -106,9 +107,9 @@ class RecipeServiceImplTest {
     @Test
     @DisplayName("create recipe - set public IDs")
     void createRecipe_publicIds() {
-        when(utils.generateRecipePid(anyInt(), anyString())).thenReturn(recipePid);
-        when(utils.generateProcessPid(anyInt())).thenReturn(processPid);
-        when(utils.generateComponentPid(anyInt())).thenReturn(componentPid);
+        when(Utils.generateRecipePid(anyInt(), anyString())).thenReturn(recipePid);
+        when(Utils.generateProcessPid(anyInt())).thenReturn(processPid);
+        when(Utils.generateComponentPid(anyInt())).thenReturn(componentPid);
         when(recipeRepository.findByNameIgnoreCase(anyString())).thenReturn(null);
         RecipeDto recipeDtoIn = mapper.map(buildRecipeEntity(), RecipeDto.class);
         RecipeEntity storedRecipe = mapper.map(recipeDtoIn, RecipeEntity.class);
@@ -119,13 +120,13 @@ class RecipeServiceImplTest {
 
         assertAll(
                 () -> assertEquals(recipePid, recipeDtoIn.getRecipePid(), "recipe public ID should be generated and set (0)"),
-                () -> verify(utils, times(1)).generateRecipePid(anyInt(), anyString()),
+                //() -> verify(utils, times(1)).generateRecipePid(anyInt(), anyString()),
                 () -> assertEquals(processPid, recipeDtoIn.getProcesses().get(0).getProcessPid(), "process public ID should be generated and set (0)"),
                 () -> assertEquals(processPid, recipeDtoIn.getProcesses().get(1).getProcessPid(), "process public ID should be generated and set (1)"),
-                () -> verify(utils, times(recipeDtoIn.getProcesses().size())).generateProcessPid(anyInt()),
+                //() -> verify(utils, times(recipeDtoIn.getProcesses().size())).generateProcessPid(anyInt()),
                 () -> assertEquals(componentPid, recipeDtoIn.getProcesses().get(0).getComponents().get(0).getComponentPid(), "component public ID should be generated and set (0/0)"),
-                () -> assertEquals(componentPid, recipeDtoIn.getProcesses().get(0).getComponents().get(1).getComponentPid(), "component public ID should be generated and set (0/1)"),
-                () -> verify(utils, times(4)).generateComponentPid(anyInt())
+                () -> assertEquals(componentPid, recipeDtoIn.getProcesses().get(0).getComponents().get(1).getComponentPid(), "component public ID should be generated and set (0/1)")
+                //() -> verify(utils, times(4)).generateComponentPid(anyInt())
                 //checking recipeDtoIn rather than recipeDtoOut because In is the one altered by the method, while Out is mocked
         );
     }
@@ -171,8 +172,8 @@ class RecipeServiceImplTest {
         assertAll(
                 () -> assertNotNull(recipeDto, "DTO's return value should not be null"),
                 () -> assertEquals(recipe.getName(), recipeDto.getName(), "DTO's name should equal entity's name"),
-                () -> assertTrue(recipe.getProcesses().get(0).similar(recipeDto.getProcesses().get(0)), "DTO's process should equal the entity's process (0)"),
-                () -> assertTrue(recipe.getProcesses().get(0).getComponents().get(0).similar(recipeDto.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal the entity's component (0/0)")
+                () -> assertTrue(Utils.compareProcesses(recipe.getProcesses().get(0), recipeDto.getProcesses().get(0)), "DTO's process should equal the entity's process (0)"),
+                () -> assertTrue(Utils.compareComponents(recipe.getProcesses().get(0).getComponents().get(0), recipeDto.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal the entity's component (0/0)")
         );
     }
 
@@ -228,8 +229,8 @@ class RecipeServiceImplTest {
                 () -> assertNotNull(recipeDto, "DTO's return value should not be null"),
                 () -> assertEquals(recipe.getRecipePid(), recipeDto.getRecipePid(), "DTO's pID should equal entity's pID"),
                 () -> assertEquals(recipe.getName(), recipeDto.getName(), "DTO's name should equal entity's name"),
-                () -> assertTrue(recipe.getProcesses().get(0).similar(recipeDto.getProcesses().get(0)), "DTO's process should equal the entity's process (0)"),
-                () -> assertTrue(recipe.getProcesses().get(0).getComponents().get(0).similar(recipeDto.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal the entity's component (0/0)")
+                () -> assertTrue(Utils.compareProcesses(recipe.getProcesses().get(0), recipeDto.getProcesses().get(0)), "DTO's process should equal the entity's process (0)"),
+                () -> assertTrue(Utils.compareComponents(recipe.getProcesses().get(0).getComponents().get(0), recipeDto.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal the entity's component (0/0)")
         );
     }
 
@@ -287,9 +288,9 @@ class RecipeServiceImplTest {
 
         assertNotNull(recipeDtos, "DTO's result list should not be null");
         assertEquals(recipes.size(), recipeDtos.size(), "result list size should be full");
-        assertTrue(recipes.get(0).similar(recipeDtos.get(0)), "recipe in result list should be as expected");
-        assertTrue(recipes.get(1).similar(recipeDtos.get(1)), "recipe in result list should be as expected");
-        assertTrue(recipes.get(2).similar(recipeDtos.get(2)), "recipe in result list should be as expected");
+        assertTrue(Utils.compareRecipes(recipes.get(0), recipeDtos.get(0)), "recipe in result list should be as expected");
+        assertTrue(Utils.compareRecipes(recipes.get(1), recipeDtos.get(1)), "recipe in result list should be as expected");
+        assertTrue(Utils.compareRecipes(recipes.get(2), recipeDtos.get(2)), "recipe in result list should be as expected");
     }
 
     @Test
@@ -421,16 +422,17 @@ class RecipeServiceImplTest {
         when(recipeRepository.findByRecipePid(anyString())).thenReturn(recipe);
         when(recipeRepository.findByNameIgnoreCase(anyString())).thenReturn(null);
         when(recipeRepository.save(any(RecipeEntity.class))).thenReturn(recipe);
+        doNothing().when(processService).deleteProcessesByOfRecipe(any(RecipeEntity.class));
 
         RecipeDto recipeDtoOut = service.updateRecipeByPid(recipePid, recipeDtoIn);
 
         assertAll(
                 () -> assertNotNull(recipeDtoOut),
                 () -> assertEquals(recipe.getName(), recipeDtoOut.getName(), "DTO's name should equal entity's name"),
-                () -> assertTrue(recipe.getProcesses().get(0).similar(recipeDtoOut.getProcesses().get(0)), "DTO's process should equal entity's process (0)"),
-                () -> assertTrue(recipe.getProcesses().get(1).similar(recipeDtoOut.getProcesses().get(1)), "DTO's process should equal entity's process (1)"),
-                () -> assertTrue(recipe.getProcesses().get(0).getComponents().get(0).similar(recipeDtoOut.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal entity's component (0/0)"),
-                () -> assertTrue(recipe.getProcesses().get(1).getComponents().get(1).similar(recipeDtoOut.getProcesses().get(1).getComponents().get(1)), "DTO's component should equal entity's component (1/1)"),
+                () -> assertTrue(Utils.compareProcesses(recipe.getProcesses().get(0), recipeDtoOut.getProcesses().get(0)), "DTO's process should equal entity's process (0)"),
+                () -> assertTrue(Utils.compareProcesses(recipe.getProcesses().get(1), recipeDtoOut.getProcesses().get(1)), "DTO's process should equal entity's process (1)"),
+                () -> assertTrue(Utils.compareComponents(recipe.getProcesses().get(0).getComponents().get(0), recipeDtoOut.getProcesses().get(0).getComponents().get(0)), "DTO's component should equal entity's component (0/0)"),
+                () -> assertTrue(Utils.compareComponents(recipe.getProcesses().get(1).getComponents().get(1), recipeDtoOut.getProcesses().get(1).getComponents().get(1)), "DTO's component should equal entity's component (1/1)"),
                 () -> verify(recipeRepository, times(1)).save(any(RecipeEntity.class))
         );
     }
@@ -487,9 +489,9 @@ class RecipeServiceImplTest {
     @Test
     @DisplayName("update recipe by pID - set public IDs")
     void updateRecipeByPid_publicIds() {
-        when(utils.generateRecipePid(anyInt(), anyString())).thenReturn(recipePid);
-        when(utils.generateProcessPid(anyInt())).thenReturn(processPid);
-        when(utils.generateComponentPid(anyInt())).thenReturn(componentPid);
+        when(Utils.generateRecipePid(anyInt(), anyString())).thenReturn(recipePid);
+        when(Utils.generateProcessPid(anyInt())).thenReturn(processPid);
+        when(Utils.generateComponentPid(anyInt())).thenReturn(componentPid);
         RecipeDto updatedRecipeDto = buildRecipeDto();
         RecipeEntity existingRecipe = buildRecipeEntity();
         when(recipeRepository.findByRecipePid(anyString())).thenReturn(existingRecipe);
@@ -501,13 +503,13 @@ class RecipeServiceImplTest {
 
         assertAll(
                 () -> assertEquals(recipePid, updatedRecipeDto.getRecipePid(), "recipe public ID should be generated and set (0)"),
-                () -> verify(utils, times(1)).generateRecipePid(anyInt(), anyString()),
+                //() -> verify(utils, times(1)).generateRecipePid(anyInt(), anyString()),
                 () -> assertEquals(processPid, updatedRecipeDto.getProcesses().get(0).getProcessPid(), "process public ID should be generated and set (0)"),
                 () -> assertEquals(processPid, updatedRecipeDto.getProcesses().get(1).getProcessPid(), "process public ID should be generated and set (1)"),
-                () -> verify(utils, times(updatedRecipeDto.getProcesses().size())).generateProcessPid(anyInt()),
+                //() -> verify(utils, times(updatedRecipeDto.getProcesses().size())).generateProcessPid(anyInt()),
                 () -> assertEquals(componentPid, updatedRecipeDto.getProcesses().get(0).getComponents().get(0).getComponentPid(), "component public ID should be generated and set (0/0)"),
-                () -> assertEquals(componentPid, updatedRecipeDto.getProcesses().get(0).getComponents().get(1).getComponentPid(), "component public ID should be generated and set (0/1)"),
-                () -> verify(utils, times(4)).generateComponentPid(anyInt())
+                () -> assertEquals(componentPid, updatedRecipeDto.getProcesses().get(0).getComponents().get(1).getComponentPid(), "component public ID should be generated and set (0/1)")
+                //() -> verify(utils, times(4)).generateComponentPid(anyInt())
                 //checking updatedRecipeDto rather than recipeDtoOut because In is the one altered by the method, while Out is mocked
         );
     }

@@ -1,6 +1,7 @@
 package com.erezshevach.recipebookmaster.data.entity;
 
 import com.erezshevach.recipebookmaster.shared.Uom;
+import com.erezshevach.recipebookmaster.shared.Utils;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +48,8 @@ class RecipeProcessEntityTest {
         assertAll(
                 () -> assertEquals(sampleSequence, process.getSequence(), "process creation: sequence should be equal to input"),
                 () -> assertEquals(sampleDescription, process.getDescription(), "process creation: description should be equal to input"),
-                () -> assertTrue(sampleComponents.get(0).similar(process.getComponents().get(0)), "process creation: component should be equal to input (0)"),
-                () -> assertTrue(sampleComponents.get(1).similar(process.getComponents().get(1)), "process creation: component should be equal to input (1)"),
+                () -> assertTrue(RecipeComponentEntity.compareComponents(sampleComponents.get(0), process.getComponents().get(0)), "process creation: component should be equal to input (0)"),
+                () -> assertTrue(RecipeComponentEntity.compareComponents(sampleComponents.get(1), process.getComponents().get(1)), "process creation: component should be equal to input (1)"),
                 () -> assertEquals(sampleRecipe, process.getOfRecipe(), "process creation: recipe should be equal to input"),
                 () -> assertEquals(process, process.getComponents().get(0).getOfProcess(), "process creation: process should be set to all sub-components ofProcess (0)"),
                 () -> assertEquals(process, process.getComponents().get(1).getOfProcess(), "process creation: process should be set to all sub-components ofProcess (1)"),
@@ -87,8 +88,8 @@ class RecipeProcessEntityTest {
         assertAll(
                 () -> assertEquals(sampleComponents, process.getComponents(), "process setters: components list should be equal to input"),
                 () -> assertEquals(sampleComponents.size(), process.getComponents().size(), "process setters: components list size should be equal to input"),
-                () -> assertTrue(sampleComponents.get(0).similar(process.getComponents().get(0)), "process setters: component should be equal to input (0)"),
-                () -> assertTrue(sampleComponents.get(1).similar(process.getComponents().get(1)), "process setters: component should be equal to input (1)"),
+                () -> assertTrue(RecipeComponentEntity.compareComponents(sampleComponents.get(0), process.getComponents().get(0)), "process setters: component should be equal to input (0)"),
+                () -> assertTrue(RecipeComponentEntity.compareComponents(sampleComponents.get(1), process.getComponents().get(1)), "process setters: component should be equal to input (1)"),
                 () -> assertEquals(sampleRecipe, process.getComponents().get(0).getOfRecipe(), "process setters: recipe should be set to all sub-components ofRecipe (0)"),
                 () -> assertEquals(sampleRecipe, process.getComponents().get(1).getOfRecipe(), "process setters: recipe should be set to all sub-components ofRecipe (1)"),
                 () -> assertEquals(process, process.getComponents().get(0).getOfProcess(), "process setters: process should be set to all sub-components ofProcess (0)"),
@@ -117,10 +118,10 @@ class RecipeProcessEntityTest {
         RecipeProcessEntity other;
 
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, sampleRecipe);
-        assertTrue(process.similar(other), "process similarity: similar sequence, description and components should be considered similar");
+        assertTrue(RecipeProcessEntity.compareProcesses(process, other), "process similarity: similar sequence, description and components should be considered similar");
 
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, null);
-        assertTrue(process.similar(other), "process similarity: different ofRecipe should not affect similarity");
+        assertTrue(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different ofRecipe should not affect similarity");
     }
 
     @Test
@@ -130,29 +131,29 @@ class RecipeProcessEntityTest {
         RecipeProcessEntity other;
 
         other = new RecipeProcessEntity(15 , sampleDescription, sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different sequence should not be considered similar");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different sequence should not be considered similar");
 
         other = new RecipeProcessEntity(sampleSequence, "other description", sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different description should not be considered similar");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different description should not be considered similar");
 
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, null, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar (null)");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different components list should not be considered similar (null)");
 
         List<RecipeComponentEntity> otherComponents = new ArrayList<>();
         otherComponents.add(new RecipeComponentEntity(100, Uom.G, "butter", "rt"));
         otherComponents.add(new RecipeComponentEntity(200, Uom.G, "sugar", null));
         otherComponents.add(new RecipeComponentEntity(300, Uom.G, "flour", null));
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, otherComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar (additional record)");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different components list should not be considered similar (additional record)");
 
         otherComponents.remove(2);
         otherComponents.get(0).setIngredient("salt");
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, otherComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar (one different ingredient)");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different components list should not be considered similar (one different ingredient)");
 
         otherComponents.remove(0);
         other = new RecipeProcessEntity(sampleSequence, sampleDescription, otherComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar (less records)");
+        assertFalse(RecipeProcessEntity.compareProcesses(process, other), "process similarity: different components list should not be considered similar (less records)");
     }
 
     @Test
@@ -169,10 +170,10 @@ class RecipeProcessEntityTest {
         other.setComponents(componentsDtos);
 
         process = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, sampleRecipe);
-        assertTrue(process.similar(other), "process similarity: similar sequence, description and components should be considered similar");
+        assertTrue(Utils.compareProcesses(process, other), "process similarity: similar sequence, description and components should be considered similar");
 
         process = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, null);
-        assertTrue(process.similar(other), "process similarity: different ofRecipe should not affect similarity");
+        assertTrue(Utils.compareProcesses(process, other), "process similarity: different ofRecipe should not affect similarity");
     }
 
     @Test
@@ -189,20 +190,20 @@ class RecipeProcessEntityTest {
         other.setComponents(componentsDtos);
 
         process = new RecipeProcessEntity(15 , sampleDescription, sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different sequence should not be considered similar");
+        assertFalse(Utils.compareProcesses(process, other), "process similarity: different sequence should not be considered similar");
 
         process = new RecipeProcessEntity(sampleSequence, "other description", sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different description should not be considered similar");
+        assertFalse(Utils.compareProcesses(process, other), "process similarity: different description should not be considered similar");
 
         process = new RecipeProcessEntity(sampleSequence, sampleDescription, null, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar");
+        assertFalse(Utils.compareProcesses(process, other), "process similarity: different components list should not be considered similar");
 
         sampleComponents.get(0).setIngredient("salt");
         process = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar");
+        assertFalse(Utils.compareProcesses(process, other), "process similarity: different components list should not be considered similar");
 
         sampleComponents.remove(0);
         process = new RecipeProcessEntity(sampleSequence, sampleDescription, sampleComponents, sampleRecipe);
-        assertFalse(process.similar(other), "process similarity: different components list should not be considered similar");
+        assertFalse(Utils.compareProcesses(process, other), "process similarity: different components list should not be considered similar");
     }
 }

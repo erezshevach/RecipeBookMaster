@@ -1,6 +1,7 @@
 package com.erezshevach.recipebookmaster.data.entity;
 
 import com.erezshevach.recipebookmaster.shared.Uom;
+import com.erezshevach.recipebookmaster.shared.Utils;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeDto;
 import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
@@ -63,14 +64,14 @@ class RecipeComponentEntityTest {
     void similar_true_entity() {
         RecipeComponentEntity other = new RecipeComponentEntity(sampleQuantity, sampleUom, sampleIngredient, sampleState);
 
-        assertTrue(sampleComponent.similar(other), "component similarity: similar quantity, uom, ingredient and state should be considered similar");
+        assertTrue(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: similar quantity, uom, ingredient and state should be considered similar");
 
         other.setOfProcess(null); //changing process
-        assertTrue(sampleComponent.similar(other), "component similarity: different ofProcess should not affect similarity");
+        assertTrue(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different ofProcess should not affect similarity");
         other.setOfProcess(sampleProcess); //matching process
 
         other.setOfRecipe(null); //changing recipe
-        assertTrue(sampleComponent.similar(other), "component similarity: different ofRecipe should not affect similarity");
+        assertTrue(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different ofRecipe should not affect similarity");
     }
 
     @Test
@@ -79,23 +80,23 @@ class RecipeComponentEntityTest {
         RecipeComponentEntity other = new RecipeComponentEntity(sampleQuantity, sampleUom, sampleIngredient, sampleState);
 
         other.setQuantity(sampleQuantity+1); //changing quantity
-        assertFalse(sampleComponent.similar(other), "component similarity: different quantities should not be considered similar");
+        assertFalse(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different quantities should not be considered similar");
         other.setQuantity(sampleQuantity); //matching quantity
 
         other.setUom(Uom.UNIT); //changing uom
-        assertFalse(sampleComponent.similar(other), "component similarity: different uom should not be considered similar");
+        assertFalse(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different uom should not be considered similar");
         other.setUom(sampleUom); //matching uom
 
         other.setIngredient("milk"); //changing ingredient
-        assertFalse(sampleComponent.similar(other), "component similarity: different ingredients should not be considered similar");
+        assertFalse(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different ingredients should not be considered similar");
         other.setIngredient(sampleIngredient); //matching ingredient
 
         other.setState("different "+sampleState); //changing state
-        assertFalse(sampleComponent.similar(other), "component similarity: different states should not be considered similar");
+        assertFalse(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different states should not be considered similar");
         other.setState(sampleState); //matching state
 
         other.setState(null); //changing state
-        assertFalse(sampleComponent.similar(other), "component similarity: different (null) states should not be considered similar");
+        assertFalse(RecipeComponentEntity.compareComponents(sampleComponent, other), "component similarity: different (null) states should not be considered similar");
     }
 
     @Test
@@ -109,14 +110,14 @@ class RecipeComponentEntityTest {
         other.setOfRecipe(mapper.map(sampleRecipe, RecipeDto.class));
         other.setOfProcess(mapper.map(sampleProcess, RecipeProcessDto.class));
 
-        assertTrue(sampleComponent.similar(other), "component similarity to dto: similar quantity, uom, ingredient and state should be considered similar");
+        assertTrue(Utils.compareComponents(sampleComponent, other), "component similarity to dto: similar quantity, uom, ingredient and state should be considered similar");
 
         other.setOfProcess(null); //changing process
-        assertTrue(sampleComponent.similar(other), "component similarity to dto: different ofProcess should not affect similarity");
+        assertTrue(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different ofProcess should not affect similarity");
         other.setOfProcess(mapper.map(sampleProcess, RecipeProcessDto.class)); //matching process
 
         other.setOfRecipe(null); //changing recipe
-        assertTrue(sampleComponent.similar(other), "component similarity to dto: different ofRecipe should not affect similarity");
+        assertTrue(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different ofRecipe should not affect similarity");
     }
 
     @Test
@@ -131,22 +132,22 @@ class RecipeComponentEntityTest {
         other.setOfProcess(mapper.map(sampleProcess, RecipeProcessDto.class));
 
         other.setQuantity(sampleQuantity+1); //changing quantity
-        assertFalse(sampleComponent.similar(other), "component similarity to dto: different quantities should not be considered similar");
+        assertFalse(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different quantities should not be considered similar");
         other.setQuantity(sampleQuantity); //matching quantity
 
         other.setUom(Uom.UNIT); //changing uom
-        assertFalse(sampleComponent.similar(other), "component similarity to dto: different uom should not be considered similar");
+        assertFalse(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different uom should not be considered similar");
         other.setUom(sampleUom); //matching uom
 
         other.setIngredient("milk"); //changing ingredient
-        assertFalse(sampleComponent.similar(other), "component similarity to dto: different ingredients should not be considered similar");
+        assertFalse(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different ingredients should not be considered similar");
         other.setIngredient(sampleIngredient); //matching ingredient
 
         other.setState("different "+sampleState); //changing state
-        assertFalse(sampleComponent.similar(other), "component similarity to dto: different states should not be considered similar");
+        assertFalse(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different states should not be considered similar");
         other.setState(sampleState); //matching state
 
         other.setState(null); //changing state
-        assertFalse(sampleComponent.similar(other), "component similarity to dto: different states should not be considered similar");
+        assertFalse(Utils.compareComponents(sampleComponent, other), "component similarity to dto: different states should not be considered similar");
     }
 }

@@ -1,7 +1,5 @@
 package com.erezshevach.recipebookmaster.data.entity;
 
-import com.erezshevach.recipebookmaster.shared.dto.RecipeComponentDto;
-import com.erezshevach.recipebookmaster.shared.dto.RecipeProcessDto;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity(name = "recipe_processes")
@@ -84,44 +83,25 @@ public class RecipeProcessEntity implements Serializable {
         return s.toString();
     }
 
-    public boolean similar(RecipeProcessEntity other) {
-        List<RecipeComponentEntity> otherComponents = other.getComponents();
-        int componentsSize = components != null ? components.size() : -1;
-        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
-        boolean componentsSimilarity = componentsSize == otherComponentsSize;
-        if (componentsSimilarity && componentsSize > 0) {
-            for (int i = 0; i < componentsSize; i++) {
-                if (!components.get(i).similar(otherComponents.get(i))){
-                    componentsSimilarity = false;
+    public static boolean compareProcesses(RecipeProcessEntity first, RecipeProcessEntity second) {
+        List<RecipeComponentEntity> components_first = first.getComponents();
+        List<RecipeComponentEntity> components_second = second.getComponents();
+        int nComponents_first = components_first != null ? components_first.size() : -1;
+        int nComponents_second = components_second != null ? components_second.size() : -1;
+        boolean matchingComponents = nComponents_first == nComponents_second;
+        if (matchingComponents && nComponents_first > 0) {
+            for (int i = 0; i < nComponents_first; i++) {
+                if (!RecipeComponentEntity.compareComponents(components_first.get(i), components_second.get(i))){
+                    matchingComponents = false;
                     break;
                 }
             }
 
         }
-        return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
-                componentsSimilarity;
+        boolean matchingSequence = first.getSequence() == second.getSequence();
+        boolean matchingDescription = Objects.equals(first.getDescription(),second.getDescription());
+        return matchingSequence && matchingDescription && matchingComponents;
     }
-
-    public boolean similar(RecipeProcessDto other) {
-        List<RecipeComponentDto> otherComponents = other.getComponents();
-        int componentsSize = components != null ? components.size() : -1;
-        int otherComponentsSize = otherComponents != null ? otherComponents.size() : -1;
-        boolean componentsSimilarity = componentsSize == otherComponentsSize;
-        if (componentsSimilarity && componentsSize > 0) {
-            for (int i = 0; i < componentsSize; i++) {
-                if (!components.get(i).similar(otherComponents.get(i))){
-                    componentsSimilarity = false;
-                    break;
-                }
-            }
-
-        }
-        return this.sequence == other.getSequence() &&
-                this.description.equals(other.getDescription()) &&
-                componentsSimilarity;
-    }
-
 
     // ---------- getters/setters ----------
 
